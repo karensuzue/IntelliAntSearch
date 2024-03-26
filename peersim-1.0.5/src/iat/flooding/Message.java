@@ -1,4 +1,4 @@
-package example.antsearch;
+package iat.flooding;
 
 public class Message {
     private final int source;

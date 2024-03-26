@@ -1,4 +1,4 @@
-package example.antsearch;
+package iat.flooding;
 
 
 import peersim.config.Configuration;
