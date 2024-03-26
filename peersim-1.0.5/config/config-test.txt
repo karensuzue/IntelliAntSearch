@@ -1,0 +1,58 @@
+################### KAREN'S PEERSIM TEST ===========================
+
+# network size
+SIZE 100
+
+# how many cycles to simulate
+CYCLE 100
+
+random.seed 0
+network.size SIZE
+simulation.cycles CYCLE # we're using cycle model
+
+# Order in which nodes are iterated over in each cycle is shuffled
+control.shf Shuffle
+
+
+################### protocols ===========================
+
+# We declare a protocol named "link"
+# IdleProtocol is a static container of links to neighboring nodes
+protocol.link peersim.core.IdleProtocol 
+
+# We declare a protocol named "avg"
+# When a pair of nodes interact, their values are averaged
+protocol.avg example.aggregation.AverageFunction
+
+# "avg" has a parameter for a Linkable, since AverageFunction doesn't 
+# have its own list of neighbors. "link" is the name of the protocol
+# implementing the Linkable interface (IdleProtocol in this case).
+protocol.avg.linkable link
+
+
+################### initialization ======================
+# Up until this point, we're just defining things
+# Now we initialize everything, and run!
+
+# We declare an initializer named "rndlink"
+# WireKOut builds a random graph by wiring each node to k randomly chosen nodes
+# NOTE: generating random edges, not nodes
+init.rndlink WireKOut
+init.rndlink.protocol link 
+init.rndlink.k 3 # number of outgoing EDGES to generate from each node.
+
+# We declare an initializer named "vals"
+# Tbh, I don't know what LinearDistribution does
+# I know it requires 3 parameters: protocol, max, min
+# It probably affects the number of nodes that can interact and 
+# whose values can be averaged for the avg protocol?
+init.vals LinearDistribution
+init.vals.protocol avg
+init.vals.max SIZE
+init.vals.min 1
+
+
+# We declare a control named "avgo" 
+# Print statistics for an average aggregation computation (?)
+control.avgo example.aggregation.AverageObserver
+control.avgo.protocol avg # takes in "avg" protocol as parameter
