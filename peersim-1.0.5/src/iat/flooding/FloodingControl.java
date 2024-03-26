@@ -20,7 +20,7 @@ public class FloodingControl implements Control {
     public boolean execute() {
         // Trigger the flooding protocol from a random node
         Node randomNode = Network.get(CommonState.r.nextInt(Network.size()));
-        int ttl = 10; // Time to live for messages
+        int ttl = 5; // Time to live for messages
 
         Message msg = new Message(randomNode.getIndex(), randomNode.getIndex(), "Hello from " + randomNode.getID(), ttl);
 

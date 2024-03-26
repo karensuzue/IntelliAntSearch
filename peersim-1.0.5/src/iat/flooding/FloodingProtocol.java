@@ -15,7 +15,11 @@ public class FloodingProtocol extends SingleValueHolder implements EDProtocol{
     }
 
     public void floodMessage(Node node, int pid, Message msg) {
-        Message copy = new Message(msg.getSource(), msg.getDestination(), msg.getContent(), msg.getTtl() - 1);
+        if (msg.getTtl() <= 0) {
+            return;
+        }
+
+        msg.decreaseTtl();
 
         for (int i = 0; i < Network.size(); i++) {
             Node peer = Network.get(i);
@@ -23,7 +27,7 @@ public class FloodingProtocol extends SingleValueHolder implements EDProtocol{
             if (peer != null && peer.getID() != node.getID()) {
                 Transport tr = (Transport) peer.getProtocol(FastConfig.getTransport(pid));
 
-                tr.send(node, peer, copy, pid); // Pass transportId instead of the protocol instance
+                tr.send(node, peer, msg, pid); // Pass transportId instead of the protocol instance
             }
         }
     }
@@ -34,6 +38,7 @@ public class FloodingProtocol extends SingleValueHolder implements EDProtocol{
         // floodMessage(node, pid, event);
         if (event instanceof Message) {
             Message msg = (Message) event;
+            
             System.out.println("Node " + node.getID() + " received message: " + msg.getContent());
 
             if (msg.getTtl() > 0) {
