@@ -1,11 +1,12 @@
 VER=1.0.4
 
+
 .PHONY: all clean doc release
 
 build:
 	javac -classpath src:jep-2.3.0.jar:djep-1.0.0.jar -d out `find src -name "*.java"` && cd out && jar cvf peersim.jar *
 build-windows:
-	javac -classpath src;jep-2.3.0.jar;djep-1.0.0.jar -d out `find src -name "*.java"` && cd out && jar cvf peersim.jar *
+	javac -classpath "src;jep-2.3.0.jar;djep-1.0.0.jar" -d out `find src -name "*.java"` && cd out && jar cvf peersim.jar *
 run:
 	java -cp "out/peersim.jar:jep-2.3.0.jar:djep-1.0.0.jar" peersim.Simulator ${config}
 run-windows:
