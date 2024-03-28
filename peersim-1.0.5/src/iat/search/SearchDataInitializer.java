@@ -35,8 +35,23 @@ init.1.and_keys 0
     }
 
     public boolean execute() {
+        for (int i = 0; i < this.queryNodes; i++) {
+            SearchProtocol prot = (SearchProtocol) Network.get(i).getProtocol(0);
+
+            prot.queryDistro.put(i, this.generateQuery());
+        }
         
         return false;
     }
+
+    private Object generateQuery() {
+        int[] keys = new int[this.keywords];
+        for (int i = 0; i < this.keywords; i++) {
+            keys[i] = i;
+        }
+        return keys;
+    }
+
+
     
 }

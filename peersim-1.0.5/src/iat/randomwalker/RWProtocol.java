@@ -31,6 +31,7 @@ public class RWProtocol extends SearchProtocol {
     public void process(SMessage mes, int protocolId) { // "Passive" behaviour implementation
         // checks for hits and notifies originator if any:
         boolean match = this.match(mes.payload);
+        
         if (match) this.notifyOriginator(mes, protocolId);
 
 

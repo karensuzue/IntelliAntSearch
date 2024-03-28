@@ -1,5 +1,8 @@
 package iat.flooding;
 
+import java.util.ArrayList;
+
+import peersim.cdsim.CDProtocol;
 import peersim.config.FastConfig;
 import peersim.core.Network;
 import peersim.core.Node;
@@ -7,12 +10,23 @@ import peersim.edsim.EDProtocol;
 import peersim.transport.Transport;
 import peersim.vector.SingleValueHolder;
 
-public class FloodingProtocol extends SingleValueHolder implements EDProtocol{
-    
+public class FloodingProtocol extends SingleValueHolder implements CDProtocol {
+    private ArrayList<Object> incomingQueue = new ArrayList<>();
 
     public FloodingProtocol(String prefix) {
         super(prefix);
     }
+
+    public Object clone() {
+        return super.clone();
+    }
+
+    public void nextCycle(Node node, int protocolID) {
+        // TODO Auto-generated method stub
+        
+    }
+
+
 
     public void floodMessage(Node node, int pid, Message msg) {
         if (msg.getTtl() <= 0) {

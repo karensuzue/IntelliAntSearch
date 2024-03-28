@@ -29,13 +29,12 @@ public class SearchObserver implements peersim.core.Control {
 
         IncrementalStats is = new IncrementalStats();
 
-
         for (int i = 0; i < Network.size(); i++) {
             peersim.core.Node node = Network.get(i);
 
             SearchProtocol prot = (SearchProtocol) node.getProtocol(pid);
 
-            is.add(prot.hitTable.size());
+            is.add(prot.messageTable.size());
         }
 
         System.out.println("SearchObserver" + ": " + time + " " + is);
