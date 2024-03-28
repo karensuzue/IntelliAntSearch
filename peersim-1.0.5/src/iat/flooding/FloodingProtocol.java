@@ -42,13 +42,9 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
         // Message has arrived at node, update as visited
         message.updateVisited(node);
 
-        // Obtain ID of linkable object used by a FloodingProtocol
-        int linkableID = FastConfig.getLinkable(protocolID);
-        // Obtain specific node linkable protocol, i.e. it's neighbors list
-        Linkable linkable = (Linkable) node.getProtocol(linkableID);
-
-        // Obtain ID of transport protocol used by a FloodingProtocol
-        int transportID = FastConfig.getTransport(protocolID);
+        // Obtain ID of linkable object used by a FloodingProtocol, then
+        // obtain specific node linkable protocol, i.e. it's neighbors list
+        Linkable linkable = (Linkable) node.getProtocol(FastConfig.getLinkable(protocolID));
 
         // Obtain source node that sent message to current node
         // Node source = message.getSource();
@@ -75,9 +71,9 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
                 newMsg.decreaseTtl();
                 
                 // Obtain transport of peer
-                Transport transport = (Transport) peer.getProtocol(transportID);
+                Transport transport = (Transport) peer.getProtocol(FastConfig.getTransport(protocolID));
                 // Send message to peer, ED Simulator listens to transport
-                transport.send(node, peer, newMsg, transportID);
+                transport.send(node, peer, newMsg, protocolID);
 
                 System.out.println("Node " + node.getID() + " sent message to node " + peer.getID() + ": " + newMsg.getContent());
             }
