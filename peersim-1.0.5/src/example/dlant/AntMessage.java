@@ -6,13 +6,13 @@ import java.util.List;
 
 public class AntMessage {
     private final int source;
-    private String content;
+    private int content;
     private double pheromoneLevel;
     private int ttl;
     private int hitCount;
     private List<Integer> path; 
 
-    public AntMessage(int source, String content, double initialPheromone, int ttl) {
+    public AntMessage(int source, int content, double initialPheromone, int ttl) {
         this.source = source;
         this.content = content;
         this.pheromoneLevel = initialPheromone;
@@ -27,11 +27,11 @@ public class AntMessage {
     }
 
     // Getter and Setter for content
-    public String getContent() {
+    public int getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(int content) {
         this.content = content;
     }
 

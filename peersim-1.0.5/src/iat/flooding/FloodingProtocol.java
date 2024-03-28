@@ -16,7 +16,7 @@ import peersim.vector.SingleValueHolder;
  * FloodingProtocol will be contained in each node. 
  * Purely Event-Driven so far. 
  */
-public class FloodingProtocol extends SingleValueHolder implements CDProtocol, EDProtocol{
+public class FloodingProtocol extends SingleValueHolder implements CDProtocol, EDProtocol {
     
     private static final String PAR_LINKABLE = "linkable";
     private static final String PAR_TRANSPORT = "transport";
@@ -80,8 +80,8 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
                 transport.send(node, peer, newMsg, protocolID);
 
                 System.out.println("Node " + node.getID() + " sent message to node " + peer.getID() + ": " + newMsg.getContent());
-
-
+            }
+        }
         else {
             System.out.println(node.getID() + " has no neighbors");
         }
@@ -112,9 +112,6 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
         else {
             // Handle other types of events if necessary
             System.err.println("Unexpected event type: " + event.getClass().getName());
-
-
-            floodMessage(node, pid, msg);
         }
     }
 
@@ -136,6 +133,5 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
         // }
         return;
     }
-
 
 }

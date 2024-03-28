@@ -1,6 +1,8 @@
 package example.dlant;
 import peersim.core.Node;
 
+import java.util.Random;
+
 import peersim.config.Configuration;
 import peersim.core.Control;
 import peersim.core.Network;
@@ -26,10 +28,10 @@ public class DLAntControl implements Control {
         int startIndex = CommonState.r.nextInt(size);
         Node startNode = Network.get(startIndex);
 
-        System.out.println("Starting search from node " + startNode.getID());
+        System.out.println("Starting search from node " + startNode.getIndex());
 
         DLAntProtocol protocol = (DLAntProtocol) startNode.getProtocol(pid);
-        protocol.startAntSearch(startNode, "resource", pid); 
+        protocol.startAntSearch(startNode, new Random().nextInt(1, Network.size()), pid); 
 
         return false;
     }
