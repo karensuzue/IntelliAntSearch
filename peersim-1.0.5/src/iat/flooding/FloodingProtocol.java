@@ -1,12 +1,9 @@
 package iat.flooding;
 
-import java.util.ArrayList;
-
 import peersim.cdsim.CDProtocol;
 import peersim.config.FastConfig;
 import peersim.core.Linkable;
 import peersim.core.Node;
-import peersim.cdsim.CDProtocol;
 import peersim.edsim.EDProtocol;
 import peersim.transport.Transport;
 import peersim.vector.SingleValueHolder;
@@ -16,7 +13,7 @@ import peersim.vector.SingleValueHolder;
  * FloodingProtocol will be contained in each node. 
  * Purely Event-Driven so far. 
  */
-public class FloodingProtocol extends SingleValueHolder implements CDProtocol, EDProtocol{
+public class FloodingProtocol extends SingleValueHolder implements CDProtocol, EDProtocol {
     
     private static final String PAR_LINKABLE = "linkable";
     private static final String PAR_TRANSPORT = "transport";
@@ -29,8 +26,6 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
     /**
      * Using a {@link Linkable} protocol, send message to neighbors of
      * a specified node. 
-     * Overrides EDProtocol's processEvent(), standard method invoked by
-     * scheduler to deliver events to FloodingProtocol. 
      * 
      * @param node
      *            the node on which this component is run.
@@ -74,18 +69,16 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
                 // Decrease TTL
                 newMsg.decreaseTtl();
                 
-                // Obtain transport of peer
+                // Obtain transport protocol of peer
                 Transport transport = (Transport) peer.getProtocol(FastConfig.getTransport(protocolID));
                 // Send message to peer, ED Simulator listens to transport
                 transport.send(node, peer, newMsg, protocolID);
 
                 System.out.println("Node " + node.getID() + " sent message to node " + peer.getID() + ": " + newMsg.getContent());
-
-
-        else {
-            System.out.println(node.getID() + " has no neighbors");
+            }
         }
 
+        else { System.out.println(node.getID() + " has no neighbors"); }
     }
 
     /**
@@ -112,9 +105,6 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
         else {
             // Handle other types of events if necessary
             System.err.println("Unexpected event type: " + event.getClass().getName());
-
-
-            floodMessage(node, pid, msg);
         }
     }
 
