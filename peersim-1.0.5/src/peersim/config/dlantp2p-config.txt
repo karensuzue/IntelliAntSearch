@@ -1,0 +1,17 @@
+# This specifies the simulation engine to use.
+simulation.engine=peersim.cdsim.CDSimulator
+
+# General properties
+network.size 100
+simulation.endtime 1000
+
+# Protocol definition
+protocol.dlant example.antsearch.DLAntProtocol
+
+# Control definition
+control.dlantcontrol example.antsearch.DLAntControl
+control.dlantcontrol.protocol dlant
+
+# Initialization
+init.dlantinit example.antsearch.DLAntControl
+init.dlantinit.protocol dlant
