@@ -1,6 +1,5 @@
 package iat.flooding;
 
-
 import peersim.config.Configuration;
 import peersim.core.Control;
 import peersim.core.Network;
@@ -24,15 +23,15 @@ public class FloodingControl implements Control {
     /**
      * Overrides Control's execute()
      * In Cycle-Driven simulations, execute() is invoked once per cycle (WIP)
-     * In Event-Driven simulations, execute() is invoked once at the beginning
+     * In Event-Driven simulations, execute() is invoked once at the beginning?
      */
     public boolean execute() {
         // Trigger the flooding protocol from a random node
         Node randSrc = Network.get(CommonState.r.nextInt(Network.size()));
         // Time to live for messages
         int ttl = 5; 
-         // Create flooding event for chosen node
-         Message msg = new Message(randSrc, randSrc, "Hello from " + randSrc.getID(), ttl);
+        
+        Message msg = new Message(randSrc, randSrc, "Hello from " + randSrc.getID(), ttl);
         ((FloodingProtocol) randSrc.getProtocol(pid)).floodMessage(randSrc, pid, msg);
         // Schedule the flooding event to occur
         // EDSimulator.add(interval, msg, randSrc, pid);

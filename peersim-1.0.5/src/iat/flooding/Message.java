@@ -30,10 +30,6 @@ public class Message {
         return content;
     }
 
-    public boolean hasVisited(int node) {
-        return path.contains(node);
-    }
-
     public int getTtl() {
         return ttl;
     }
