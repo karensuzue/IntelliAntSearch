@@ -54,5 +54,6 @@ init.vals.min 1
 
 # We declare a control named "avgo" 
 # Print statistics for an average aggregation computation (?)
+# Control components are responsible for executing actions at specific points in the simulation
 control.avgo example.aggregation.AverageObserver
 control.avgo.protocol avg # takes in "avg" protocol as parameter
