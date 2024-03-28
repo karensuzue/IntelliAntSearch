@@ -25,7 +25,7 @@ public class DLAntControl implements Control {
         Node startNode = Network.get(startIndex);
 
         DLAntProtocol protocol = (DLAntProtocol) startNode.getProtocol(pid);
-        protocol.startAntSearch(startNode);
+        protocol.startAntSearch(startNode, "resource"); 
 
         return false;
     }

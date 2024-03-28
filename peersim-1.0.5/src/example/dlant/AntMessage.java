@@ -1,21 +1,23 @@
-import java.util.ArrayList;
+package example.dlant;
+
+import java.util.LinkedList;
 import java.util.List;
 
 public class AntMessage {
     private final int source;
-    private String query; // The query or the object being searched for
+    private String content;
     private double pheromoneLevel;
-    private int ttl; // Time to live for the ant
-    private int hitCount; // Number of successful responses
-    private List<Integer> routeHistory; // List of node IDs visited
+    private int ttl;
+    private int hitCount;
+    private List<Integer> path; 
 
-    public AntMessage(int source, String query, double initialPheromone, int ttl) {
+    public AntMessage(int source, String content, double initialPheromone, int ttl) {
         this.source = source;
-        this.query = query;
+        this.content = content;
         this.pheromoneLevel = initialPheromone;
         this.ttl = ttl;
         this.hitCount = 0;
-        this.routeHistory = new ArrayList<>();
+        this.path = new LinkedList<>();
     }
 
     // Getter for source
@@ -23,13 +25,13 @@ public class AntMessage {
         return source;
     }
 
-    // Getter and Setter for query
-    public String getQuery() {
-        return query;
+    // Getter and Setter for content
+    public String getContent() {
+        return content;
     }
 
-    public void setQuery(String query) {
-        this.query = query;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     // Getter and Setter for pheromoneLevel
@@ -46,8 +48,8 @@ public class AntMessage {
         return ttl;
     }
 
-    public void decreaseTtl() {
-        this.ttl--;
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
     }
 
     // Getter and Setter for hitCount
@@ -59,20 +61,34 @@ public class AntMessage {
         this.hitCount++;
     }
 
-    // Methods for routeHistory
-    public void addToRouteHistory(int nodeId) {
-        routeHistory.add(nodeId);
+    // Method for path (formerly routeHistory)
+    public void addToPath(int nodeId) {
+        path.add(nodeId);
     }
 
-    public List<Integer> getRouteHistory() {
-        return new ArrayList<>(routeHistory);
+    public List<Integer> getPath() {
+        return new LinkedList<>(path);
     }
 
-    // Method to replicate this ant for sending to another node, with deep copy of routeHistory
+    // Define the isHit method
+    public boolean isHit() {
+        return hitCount > 0;
+    }
+
+    // Define the getPreviousNodeIndex method
+    public Integer getPreviousNodeIndex() {
+        if (path.isEmpty()) {
+            return null;
+        } else {
+            return path.get(path.size() - 1);
+        }
+    }
+
+    // Method to replicate this ant for sending to another node, with deep copy of path
     public AntMessage replicateForForwarding() {
-        AntMessage replicatedAnt = new AntMessage(this.source, this.query, this.pheromoneLevel, this.ttl);
+        AntMessage replicatedAnt = new AntMessage(this.source, this.content, this.pheromoneLevel, this.ttl);
         replicatedAnt.hitCount = this.hitCount;
-        replicatedAnt.routeHistory = new ArrayList<>(this.routeHistory); // Deep copy of route history
+        replicatedAnt.path = new LinkedList<>(this.path); // Deep copy of path
         return replicatedAnt;
     }
 
@@ -80,11 +96,11 @@ public class AntMessage {
     public String toString() {
         return "AntMessage{" +
                 "source=" + source +
-                ", query='" + query + '\'' +
+                ", content='" + content + '\'' +
                 ", pheromoneLevel=" + pheromoneLevel +
                 ", ttl=" + ttl +
                 ", hitCount=" + hitCount +
-                ", routeHistory=" + routeHistory +
+                ", path=" + path +
                 '}';
     }
 }
