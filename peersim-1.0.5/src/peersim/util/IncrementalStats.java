@@ -179,8 +179,15 @@ public double getStD() { return Math.sqrt(getVar()); }
 */
 public String toString() {
 
-	return min+" "+max+" "+n+" "+sum/n+" "+getVar()+" "+
-		countmin+" "+countmax;
+	// identify each variable with parenthesis
+	// return min+" "+max+" "+n+" "+sum/n+" "+getVar()+" "+
+	// 	countmin+" "+countmax;
+	
+	return "min: ("+min+") max: ("+max+") n: ("+n+") avg: ("+sum/n+") var: ("+getVar()+") mincount: ("+countmin+") maxcount: ("+countmax+")";
+
+
+
+
 }
 
 }

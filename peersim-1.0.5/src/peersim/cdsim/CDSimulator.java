@@ -166,6 +166,8 @@ private static String[] loadControls()
  */
 public static final boolean isConfigurationCycleDriven()
 {
+	System.out.println("CDSimulator: isConfigurationCycleDriven");
+	
 	return Configuration.contains(PAR_CYCLES);
 }
 

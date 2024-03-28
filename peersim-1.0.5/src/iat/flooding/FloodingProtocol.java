@@ -1,5 +1,8 @@
 package iat.flooding;
 
+import java.util.ArrayList;
+
+import peersim.cdsim.CDProtocol;
 import peersim.config.FastConfig;
 import peersim.core.Linkable;
 import peersim.core.Node;
@@ -22,7 +25,7 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
     public FloodingProtocol(String prefix) {
         super(prefix);
     }
-
+    
     /**
      * Using a {@link Linkable} protocol, send message to neighbors of
      * a specified node. 
@@ -77,12 +80,12 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
                 transport.send(node, peer, newMsg, protocolID);
 
                 System.out.println("Node " + node.getID() + " sent message to node " + peer.getID() + ": " + newMsg.getContent());
-            }
-        }
+
 
         else {
             System.out.println(node.getID() + " has no neighbors");
         }
+
     }
 
     /**
@@ -101,6 +104,7 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
         if (event instanceof Message) {
             Message msg = (Message) event;
             System.out.println("Node " + node.getID() + " received message: " + msg.getContent());
+
             if (msg.getTtl() > 0) {
                 floodMessage(node, protocolID, msg);
             }
@@ -108,6 +112,9 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
         else {
             // Handle other types of events if necessary
             System.err.println("Unexpected event type: " + event.getClass().getName());
+
+
+            floodMessage(node, pid, msg);
         }
     }
 
