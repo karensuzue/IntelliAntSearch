@@ -65,16 +65,26 @@ public class DLAntProtocol implements EDProtocol {
 
     private void forwardAnt(AntMessage msg, Node currentNode) {
         Linkable linkable = (Linkable) currentNode.getProtocol(linkablePid);
-        System.out.println(linkable.degree());
-        if (linkable.degree() > 0) {
-            IntStream.range(0, linkable.degree()).forEach(i -> {
+        if (linkable.degree() > 0 && msg.getTtl() > 0) {
+            // Decrement TTL by 1 as a base case
+            msg.setTtl(msg.getTtl() - 1);
+    
+            for (int i = 0; i < linkable.degree(); i++) {
                 Node neighbor = linkable.getNeighbor(i);
+    
+                // Check if the pheromone level is above a threshold before forwarding
                 double pheromoneLevel = pheromoneLevels.getOrDefault(neighbor, 0.0);
                 if (pheromoneLevel > alpha) {
+                    AntMessage replicatedMsg = msg.replicateForForwarding();
+    
+                    // Adjust TTL based on pheromone level or other criteria if necessary
+                    // For example, you might increase TTL if pheromoneLevel is exceptionally high,
+                    // indicating a highly promising path.
+    
                     Transport transport = (Transport) currentNode.getProtocol(transportPid);
-                    transport.send(currentNode, neighbor, msg.replicateForForwarding(), transportPid);
+                    transport.send(currentNode, neighbor, replicatedMsg, transportPid);
                 }
-            });
+            }
         }
     }
 
