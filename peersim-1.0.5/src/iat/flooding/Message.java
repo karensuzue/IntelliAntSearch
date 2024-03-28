@@ -30,7 +30,6 @@ public class Message {
         return content;
     }
 
-
     public int getTtl() {
         return ttl;
     }

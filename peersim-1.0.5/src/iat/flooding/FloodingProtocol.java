@@ -1,12 +1,9 @@
 package iat.flooding;
 
-import java.util.ArrayList;
-
 import peersim.cdsim.CDProtocol;
 import peersim.config.FastConfig;
 import peersim.core.Linkable;
 import peersim.core.Node;
-import peersim.cdsim.CDProtocol;
 import peersim.edsim.EDProtocol;
 import peersim.transport.Transport;
 import peersim.vector.SingleValueHolder;
@@ -29,8 +26,6 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
     /**
      * Using a {@link Linkable} protocol, send message to neighbors of
      * a specified node. 
-     * Overrides EDProtocol's processEvent(), standard method invoked by
-     * scheduler to deliver events to FloodingProtocol. 
      * 
      * @param node
      *            the node on which this component is run.
@@ -74,7 +69,7 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
                 // Decrease TTL
                 newMsg.decreaseTtl();
                 
-                // Obtain transport of peer
+                // Obtain transport protocol of peer
                 Transport transport = (Transport) peer.getProtocol(FastConfig.getTransport(protocolID));
                 // Send message to peer, ED Simulator listens to transport
                 transport.send(node, peer, newMsg, protocolID);
@@ -82,10 +77,7 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
                 System.out.println("Node " + node.getID() + " sent message to node " + peer.getID() + ": " + newMsg.getContent());
             }
         }
-        else {
-            System.out.println(node.getID() + " has no neighbors");
-        }
-
+        else { System.out.println(node.getID() + " has no neighbors"); }
     }
 
     /**
