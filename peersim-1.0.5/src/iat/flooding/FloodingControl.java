@@ -5,7 +5,6 @@ import peersim.config.Configuration;
 import peersim.core.Control;
 import peersim.core.Network;
 import peersim.core.Node;
-import peersim.edsim.EDSimulator;
 import peersim.core.CommonState;
 
 public class FloodingControl implements Control {

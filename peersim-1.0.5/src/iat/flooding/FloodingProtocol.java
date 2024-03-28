@@ -11,6 +11,7 @@ import peersim.vector.SingleValueHolder;
 /**
  * This class provides an implementation for the flooding protocol.
  * FloodingProtocol will be contained in each node. 
+ * Purely Event-Driven so far. 
  */
 public class FloodingProtocol extends SingleValueHolder implements CDProtocol, EDProtocol{
     
