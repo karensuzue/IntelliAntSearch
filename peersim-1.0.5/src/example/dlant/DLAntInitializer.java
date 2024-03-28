@@ -43,10 +43,10 @@ public class DLAntInitializer implements Control {
         for (int i = 0; i < Network.size(); i++) {
             DLAntProtocol prot = (DLAntProtocol) Network.get(i).getProtocol(pid);
 
-            int resourceAmount = new Random().nextInt(1, 5);
+            int resourceAmount = new Random().nextInt(5);
 
             for (int j = 0; j < resourceAmount; j++) {
-                int value = new Random().nextInt(1, Network.size() + 1);
+                int value = new Random().nextInt(Network.size() + 1);
 
                 prot.addResource(value);
             }

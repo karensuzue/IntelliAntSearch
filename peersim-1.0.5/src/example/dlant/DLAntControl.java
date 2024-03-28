@@ -31,7 +31,7 @@ public class DLAntControl implements Control {
         System.out.println("Starting search from node " + startNode.getIndex());
 
         DLAntProtocol protocol = (DLAntProtocol) startNode.getProtocol(pid);
-        protocol.startAntSearch(startNode, new Random().nextInt(1, Network.size()), pid); 
+        protocol.startAntSearch(startNode, new Random().nextInt( Network.size()), pid); 
 
         return false;
     }
