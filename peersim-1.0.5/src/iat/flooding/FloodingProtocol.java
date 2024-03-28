@@ -38,6 +38,9 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
     public void floodMessage(Node node, int protocolID, Message message) {
         // Return if TTL expires
         if (message.getTtl() <= 0) { return; }
+        
+        // Message has arrived at node, update as visited
+        message.updateVisited(node);
 
         // Obtain ID of linkable object used by a FloodingProtocol
         int linkableID = FastConfig.getLinkable(protocolID);
@@ -46,16 +49,14 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
 
         // Obtain ID of transport protocol used by a FloodingProtocol
         int transportID = FastConfig.getTransport(protocolID);
-        // Obtain transport protocol specific to node 
-        Transport transport = (Transport) node.getProtocol(transportID);
 
         // Obtain source node that sent message to current node
-        Node source = message.getSource();
-        assert(message.getDestination().equals(node)); // SANITY CHECK - is message's destination truly current node?
+        // Node source = message.getSource();
+        // assert(message.getDestination().equals(node)); // SANITY CHECK - is message's destination truly current node?
 
         // If node has neighbors
         if (linkable.degree() > 0) {
-            // Send message to all neighbors, except for the one it's responding to
+            // Send message to all neighbors, except for nodes it has already visited
             for (int i = 0; i < linkable.degree(); i++) {
                 Node peer = linkable.getNeighbor(i);
 
@@ -63,16 +64,27 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
                 if (!peer.isUp()) { continue; }
 
                 // If peer is the one sending current node this message, continue
-                if (peer.equals(source)) { continue; }
+                // if (peer.equals(source)) { continue; }
+
+                // If message has visited peer, continue
+                if (message.hasVisited(peer)) { continue; }
 
                 // Create copy of current message, update source and destination
                 Message newMsg = new Message(node, peer, message.getContent(), message.getTtl());
                 // Decrease TTL
                 newMsg.decreaseTtl();
-
+                
+                // Obtain transport of peer
+                Transport transport = (Transport) peer.getProtocol(transportID);
                 // Send message to peer, ED Simulator listens to transport
                 transport.send(node, peer, newMsg, transportID);
+
+                System.out.println("Node " + node.getID() + " sent message to node " + peer.getID() + ": " + newMsg.getContent());
             }
+        }
+
+        else {
+            System.out.println(node.getID() + " has no neighbors");
         }
     }
 

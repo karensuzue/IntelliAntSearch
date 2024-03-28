@@ -15,14 +15,11 @@ public class FloodingControl implements Control {
 
     // ID of FloodingProtocol
     private final int pid;
-    private final int interval;
-
+    
     // Constructor
     public FloodingControl(String prefix) {
         // No FastConfig here
         pid = Configuration.getPid(prefix + "." + PAR_PROTO);
-        // Default interval of 10 time units
-        interval = Configuration.getInt(prefix + ".interval", 10); 
     }
 
     /**
