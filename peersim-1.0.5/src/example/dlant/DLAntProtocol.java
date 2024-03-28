@@ -8,8 +8,11 @@ import peersim.core.Node;
 import peersim.edsim.EDProtocol;
 import peersim.edsim.EDSimulator;
 import peersim.transport.Transport;
+import peersim.vector.SingleValueHolder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
@@ -27,6 +30,8 @@ public class DLAntProtocol implements EDProtocol {
     private final int transportPid; // Transport layer ID
     private final int linkablePid; // Linkable layer ID
     private final Map<Node, Double> pheromoneLevels; // Pheromone levels to neighbors
+    
+    protected List<Integer> resources;
 
     // Constructor that initializes the protocol's parameters
     public DLAntProtocol(String prefix) {
@@ -35,9 +40,23 @@ public class DLAntProtocol implements EDProtocol {
         this.alpha = Configuration.getDouble(prefix + PAR_ALPHA, 1.0);
         this.evaporation = Configuration.getDouble(prefix + PAR_EVAPORATION, 0.1);
         this.pheromoneLevels = new HashMap<>();
+
+        this.resources = new ArrayList<>();
     }
 
-    public void startAntSearch(Node startNode, String objectToSearch, int pid) {
+    public void addResource(int resource) {
+        resources.add(resource);
+    }
+
+    public boolean hasResource(int resource) {
+        return resources.contains(resource);
+    }
+
+    public ArrayList<Integer> getResources() {
+        return new ArrayList<>(resources);
+    }
+
+    public void startAntSearch(Node startNode, int objectToSearch, int pid) {
         AntMessage msg = new AntMessage(startNode.getIndex(), objectToSearch, alpha, calculateInitialTTL());
 
         EDSimulator.add(0, msg, startNode, pid);
@@ -53,6 +72,11 @@ public class DLAntProtocol implements EDProtocol {
             }
 
             msg.addToPath(node.getIndex());
+
+            // Check if the object is found
+            if (this.resources.contains(msg.getContent())) {
+                msg.incrementHitCount();
+            }
 
             // Pheromone evaporation
             pheromoneLevels.forEach((key, value) -> pheromoneLevels.put(key, value * (1 - evaporation)));
@@ -73,6 +97,7 @@ public class DLAntProtocol implements EDProtocol {
 
     private void forwardAnt(AntMessage msg, Node currentNode, int pid) {
         Linkable linkable = (Linkable) currentNode.getProtocol(linkablePid);
+
         if (linkable.degree() > 0) {
             IntStream.range(0, linkable.degree()).forEach(i -> {
                 Node neighbor = linkable.getNeighbor(i);

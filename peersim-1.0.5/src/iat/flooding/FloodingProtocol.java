@@ -77,7 +77,6 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
                 System.out.println("Node " + node.getID() + " sent message to node " + peer.getID() + ": " + newMsg.getContent());
             }
         }
-
         else { System.out.println(node.getID() + " has no neighbors"); }
     }
 
@@ -126,6 +125,5 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
         // }
         return;
     }
-
 
 }
