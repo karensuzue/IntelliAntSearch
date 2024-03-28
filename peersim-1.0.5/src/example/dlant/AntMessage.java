@@ -1,5 +1,6 @@
 package example.dlant;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class AntMessage {
         this.pheromoneLevel = initialPheromone;
         this.ttl = ttl;
         this.hitCount = 0;
-        this.path = new LinkedList<>();
+        this.path = new ArrayList<Integer>();
     }
 
     // Getter for source
@@ -88,7 +89,7 @@ public class AntMessage {
     public AntMessage replicateForForwarding() {
         AntMessage replicatedAnt = new AntMessage(this.source, this.content, this.pheromoneLevel, this.ttl - 1);
         replicatedAnt.hitCount = this.hitCount;
-        replicatedAnt.path = new LinkedList<>(this.path); // Deep copy of path
+        replicatedAnt.path = new ArrayList<>(path);// Deep copy of path
         return replicatedAnt;
     }
 

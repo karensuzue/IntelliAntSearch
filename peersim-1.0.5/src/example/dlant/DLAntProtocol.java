@@ -48,6 +48,12 @@ public class DLAntProtocol implements EDProtocol {
         if (event instanceof AntMessage) {
             AntMessage msg = (AntMessage) event;
 
+            if (msg.getPath().contains(node.getIndex())) {
+                return;
+            }
+
+            msg.addToPath(node.getIndex());
+
             // Pheromone evaporation
             pheromoneLevels.forEach((key, value) -> pheromoneLevels.put(key, value * (1 - evaporation)));
             
@@ -90,7 +96,7 @@ public class DLAntProtocol implements EDProtocol {
     }
 
     private int calculateInitialTTL() {
-        return Configuration.getInt("simulation.initialTTL", 5);
+        return Configuration.getInt("simulation.initialTTL", 2);
     }
 
     @Override

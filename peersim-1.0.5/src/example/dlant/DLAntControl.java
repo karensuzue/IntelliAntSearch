@@ -14,16 +14,19 @@ public class DLAntControl implements Control {
         pid = Configuration.getPid(prefix + ".protocol");
     }
 
-    @Override
+    
     public boolean execute() {
         int size = Network.size();
 
         if (size == 0) {
             return true;
         }
+        
 
         int startIndex = CommonState.r.nextInt(size);
         Node startNode = Network.get(startIndex);
+
+        System.out.println("Starting search from node " + startNode.getID());
 
         DLAntProtocol protocol = (DLAntProtocol) startNode.getProtocol(pid);
         protocol.startAntSearch(startNode, "resource", pid); 
