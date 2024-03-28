@@ -50,6 +50,8 @@ public class DLAntProtocol implements EDProtocol {
 
             // Pheromone evaporation
             pheromoneLevels.forEach((key, value) -> pheromoneLevels.put(key, value * (1 - evaporation)));
+            
+            System.out.println(msg);
 
             // Update pheromone levels upon successful discovery
             if (msg.isHit()) {
@@ -58,21 +60,22 @@ public class DLAntProtocol implements EDProtocol {
 
             // Forward the ant to neighbors based on the pheromone level
             if (msg.getTtl() > 0) {
-                forwardAnt(msg, node);
+                forwardAnt(msg, node, pid);
             }
         }
     }
 
-    private void forwardAnt(AntMessage msg, Node currentNode) {
+    private void forwardAnt(AntMessage msg, Node currentNode, int pid) {
         Linkable linkable = (Linkable) currentNode.getProtocol(linkablePid);
-        System.out.println(linkable.degree());
         if (linkable.degree() > 0) {
             IntStream.range(0, linkable.degree()).forEach(i -> {
                 Node neighbor = linkable.getNeighbor(i);
-                double pheromoneLevel = pheromoneLevels.getOrDefault(neighbor, 0.0);
-                if (pheromoneLevel > alpha) {
+                double pheromoneLevel = pheromoneLevels.getOrDefault(neighbor, 1.0);
+
+                if (pheromoneLevel >= alpha) {
                     Transport transport = (Transport) currentNode.getProtocol(transportPid);
-                    transport.send(currentNode, neighbor, msg.replicateForForwarding(), transportPid);
+
+                    transport.send(currentNode, neighbor, msg.replicateForForwarding(), pid);
                 }
             });
         }
