@@ -330,7 +330,7 @@ public static void nextExperiment()
 {
 	// Reading parameter
 	if( Configuration.contains(PAR_PQ) ) 
-		heap = (PriorityQ) Configuration.getInstance(PAR_PQ);
+		heap = (PriorityQ) Configuration.getInstance(PAR_PQ); // event queue
 	else 
 		heap = new Heap();
 	endtime = Configuration.getLong(PAR_ENDTIME);

@@ -1,9 +1,7 @@
 package iat.flooding;
 
-import peersim.core.CommonState;
 import peersim.config.FastConfig;
 import peersim.core.Linkable;
-import peersim.core.Network;
 import peersim.core.Node;
 import peersim.cdsim.CDProtocol;
 import peersim.edsim.EDProtocol;
@@ -12,6 +10,7 @@ import peersim.vector.SingleValueHolder;
 
 /**
  * This class provides an implementation for the flooding protocol.
+ * FloodingProtocol will be contained in each node. 
  */
 public class FloodingProtocol extends SingleValueHolder implements CDProtocol, EDProtocol{
     
@@ -71,7 +70,7 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
                 // Decrease TTL
                 newMsg.decreaseTtl();
 
-                // Send message to peer
+                // Send message to peer, ED Simulator listens to transport
                 transport.send(node, peer, newMsg, transportID);
             }
         }
@@ -89,7 +88,6 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
      * @param event 
      *            the delivered event
      */
-
     public void processEvent(Node node, int protocolID, Object event) {
         if (event instanceof Message) {
             Message msg = (Message) event;
@@ -98,7 +96,6 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
                 floodMessage(node, protocolID, msg);
             }
         } 
-
         else {
             // Handle other types of events if necessary
             System.err.println("Unexpected event type: " + event.getClass().getName());

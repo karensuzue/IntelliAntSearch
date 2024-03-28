@@ -5,8 +5,8 @@ import peersim.config.Configuration;
 import peersim.core.Control;
 import peersim.core.Network;
 import peersim.core.Node;
+import peersim.edsim.EDSimulator;
 import peersim.core.CommonState;
-import peersim.edsim.EDSimulator; 
 
 public class FloodingControl implements Control {
 
@@ -35,13 +35,11 @@ public class FloodingControl implements Control {
         Node randSrc = Network.get(CommonState.r.nextInt(Network.size()));
         // Time to live for messages
         int ttl = 5; 
-        // Create a message for flooding
-        Message msg = new Message(randSrc, randSrc, "Hello from " + randSrc.getID(), ttl);
-        // Deliver the message to the protocol for processing
-        ((FloodingProtocol) randSrc.getProtocol(pid)).processEvent(randSrc, pid, msg);
-        
+         // Create flooding event for chosen node
+         Message msg = new Message(randSrc, randSrc, "Hello from " + randSrc.getID(), ttl);
+        ((FloodingProtocol) randSrc.getProtocol(pid)).floodMessage(randSrc, pid, msg);
+        // Schedule the flooding event to occur
+        // EDSimulator.add(interval, msg, randSrc, pid);
         return false;
     }
-
-    
 }
