@@ -4,46 +4,42 @@ import java.util.ArrayList;
 
 import peersim.cdsim.CDProtocol;
 import peersim.config.FastConfig;
+import peersim.core.Linkable;
 import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
 import peersim.transport.Transport;
 import peersim.vector.SingleValueHolder;
 
-public class FloodingProtocol extends SingleValueHolder implements CDProtocol {
-    private ArrayList<Object> incomingQueue = new ArrayList<>();
-
+public class FloodingProtocol extends SingleValueHolder implements EDProtocol {
     public FloodingProtocol(String prefix) {
         super(prefix);
     }
 
-    public Object clone() {
-        return super.clone();
-    }
-
-    public void nextCycle(Node node, int protocolID) {
-        // TODO Auto-generated method stub
-        
-    }
-
-
-
     public void floodMessage(Node node, int pid, Message msg) {
-        if (msg.getTtl() <= 0) {
+        if (msg.getTtl() <= 0 || msg.hasVisited((int)node.getID())) {
             return;
         }
 
-        msg.decreaseTtl();
+        Message newMsg = msg.replicateForSending(((int)node.getID()));
 
-        for (int i = 0; i < Network.size(); i++) {
-            Node peer = Network.get(i);
-            
-            if (peer != null && peer.getID() != node.getID()) {
-                Transport tr = (Transport) peer.getProtocol(FastConfig.getTransport(pid));
+        Linkable linkable = (Linkable) node.getProtocol(FastConfig.getLinkable(pid));
 
-                tr.send(node, peer, msg, pid); // Pass transportId instead of the protocol instance
+        for (int i = 0; i < linkable.degree(); i++) {
+            Node peer = linkable.getNeighbor(i);
+
+            if (newMsg.hasVisited((int)peer.getID())) {
+                continue;
             }
+
+            Transport tr = (Transport) peer.getProtocol(FastConfig.getTransport(pid));
+
+            tr.send(node, peer, newMsg, pid);
+
+            System.out.println("Node " + node.getID() + " sent message to node " + peer.getID() + ": " + newMsg.getContent());
         }
+
+       
     }
 
     public void processEvent(Node node, int pid, Object event) {
@@ -55,9 +51,7 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol {
             
             System.out.println("Node " + node.getID() + " received message: " + msg.getContent());
 
-            if (msg.getTtl() > 0) {
-                floodMessage(node, pid, msg);
-            }
+            floodMessage(node, pid, msg);
         }
     }
 }
