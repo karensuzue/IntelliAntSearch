@@ -1,10 +1,12 @@
 package example.dlant;
-
 import peersim.core.Node;
+
+import java.util.Random;
+
 import peersim.config.Configuration;
 import peersim.core.Control;
 import peersim.core.Network;
-import peersim.core.CommonState;
+import peersim.core.CommonState; // Import CommonState
 
 public class DLAntControl implements Control {
 
@@ -14,27 +16,23 @@ public class DLAntControl implements Control {
         pid = Configuration.getPid(prefix + ".protocol");
     }
 
-    @Override
+    
     public boolean execute() {
         int size = Network.size();
 
         if (size == 0) {
-            System.out.println("Network is empty, skipping control execution.");
-            return true; // Simulation should stop if there are no nodes
+            return true;
         }
+        
 
         int startIndex = CommonState.r.nextInt(size);
         Node startNode = Network.get(startIndex);
 
-        System.out.println("Starting ant search from node " + startIndex);
+        System.out.println("Starting search from node " + startNode.getIndex());
 
         DLAntProtocol protocol = (DLAntProtocol) startNode.getProtocol(pid);
-        if (protocol != null) {
-            protocol.startAntSearch(startNode, "resource", pid);
-        } else {
-            System.out.println("DLAntProtocol not found on node " + startIndex + ", skipping.");
-        }
+        protocol.startAntSearch(startNode, new Random().nextInt( Network.size()), pid); 
 
-        return false; // Return false to indicate that the simulation should not stop
+        return false;
     }
 }
