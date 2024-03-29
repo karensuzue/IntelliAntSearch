@@ -82,7 +82,6 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
 
     /**
      * Execute floodMessage() for Event-Driven simulations
-     * Overrides EDProtocol's processEvent()
      * Processes incoming messages (in the form of events)
      * 
      * @param node
@@ -92,6 +91,7 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
      * @param event 
      *            the delivered event
      */
+    @Override
     public void processEvent(Node node, int protocolID, Object event) {
         if (event instanceof Message) {
             Message msg = (Message) event;
@@ -110,7 +110,6 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
     /**
      * WIP
      * Execute floodMessage() for Cycle-Driven simulations
-     * Overrides CDProtocol's nextCycle(), performs periodically
      * Needs "inbox" data structure to keep track all of the messages?
      * Flooding probably easier to implement with Event-Driven mode
      * 
@@ -119,6 +118,7 @@ public class FloodingProtocol extends SingleValueHolder implements CDProtocol, E
      * @param protocolID
      *            the id of this protocol in the protocol array.
      */
+    @Override
     public void nextCycle(Node node, int protocolID) {
         // if (msg.getTtl() > 0) {
             // floodMessage(node, protocolID, msg);
