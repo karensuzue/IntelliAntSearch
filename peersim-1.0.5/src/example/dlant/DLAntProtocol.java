@@ -29,7 +29,7 @@ public class DLAntProtocol implements EDProtocol {
     private final double evaporation; // Rate of pheromone evaporation
     private final int transportPid; // Transport layer ID
     private final int linkablePid; // Linkable layer ID
-    private final Map<Node, Double> pheromoneLevels; // Pheromone levels to neighbors
+    private final Map<Integer, Double> pheromoneLevels; // Pheromone levels to neighbors
     
     protected List<Integer> resources;
 
@@ -79,10 +79,10 @@ public class DLAntProtocol implements EDProtocol {
             }
 
             // Pheromone evaporation
-            pheromoneLevels.forEach((key, value) -> pheromoneLevels.put(key, value * (1 - evaporation)));
+            pheromoneLevels.forEach((key, value) -> pheromoneLevels.put(key, value * (1 - evaporation)));     
             
             System.out.println(msg);
-
+            
             // Update pheromone levels upon successful discovery
             if (msg.isHit()) {
                 updatePheromones(msg, node);
@@ -101,8 +101,9 @@ public class DLAntProtocol implements EDProtocol {
         if (linkable.degree() > 0) {
             IntStream.range(0, linkable.degree()).forEach(i -> {
                 Node neighbor = linkable.getNeighbor(i);
-                double pheromoneLevel = pheromoneLevels.getOrDefault(neighbor, 1.0);
+                double pheromoneLevel = pheromoneLevels.getOrDefault(neighbor.getIndex(), 1.0);
 
+                System.out.println(neighbor.getIndex() + " " + pheromoneLevels);
                 if (pheromoneLevel >= alpha) {
                     Transport transport = (Transport) currentNode.getProtocol(transportPid);
 
@@ -114,9 +115,11 @@ public class DLAntProtocol implements EDProtocol {
 
     private void updatePheromones(AntMessage msg, Node currentNode) {
         Integer previousNodeIndex = msg.getPreviousNodeIndex();
+
         if (previousNodeIndex != null) {
             Node previousNode = Network.get(previousNodeIndex); // Convert index to Node
-            pheromoneLevels.merge(previousNode, alpha, (oldValue, newValue) -> oldValue + newValue);
+            pheromoneLevels.merge(previousNode.getIndex(), alpha, (oldValue, newValue) -> oldValue + newValue);
+
         }
     }
 
