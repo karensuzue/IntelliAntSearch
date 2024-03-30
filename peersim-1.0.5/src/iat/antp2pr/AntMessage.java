@@ -8,13 +8,12 @@ public class AntMessage {
     private final int source;
     private int content;
     private int ttl;
-    private int hitCount;
+    private int hitCount; // if hitCount > 1, success
     private List<Integer> path; 
 
-    public AntMessage(int source, int content, double initialPheromone, int ttl) {
+    public AntMessage(int source, int content, int ttl) {
         this.source = source;
         this.content = content;
-        this.pheromoneLevel = initialPheromone;
         this.ttl = ttl;
         this.hitCount = 0;
         this.path = new ArrayList<Integer>();
@@ -25,43 +24,36 @@ public class AntMessage {
         return source;
     }
 
-    // Getter and Setter for content
+    // Getter for content
     public int getContent() {
         return content;
     }
-
+    
+    // Setter for content
     public void setContent(int content) {
         this.content = content;
     }
 
-    // Getter and Setter for pheromoneLevel
-    public double getPheromoneLevel() {
-        return pheromoneLevel;
-    }
-
-    public void setPheromoneLevel(double pheromoneLevel) {
-        this.pheromoneLevel = pheromoneLevel;
-    }
-
-    // Getter and Setter for TTL
+    // Getter for TTL
     public int getTtl() {
         return ttl;
     }
 
+    // Setter for TTL
     public void setTtl(int ttl) {
         this.ttl = ttl;
     }
 
-    // Getter and Setter for hitCount
+    // Getter for hitCount
     public int getHitCount() {
         return hitCount;
     }
-
+    // Increment hitCount
     public void incrementHitCount() {
         this.hitCount++;
     }
 
-    // Method for path (formerly routeHistory)
+    // Method for path
     public void addToPath(int nodeId) {
         path.add(nodeId);
     }
@@ -86,7 +78,7 @@ public class AntMessage {
 
     // Method to replicate this ant for sending to another node, with deep copy of path
     public AntMessage replicateForForwarding() {
-        AntMessage replicatedAnt = new AntMessage(this.source, this.content, this.pheromoneLevel, this.ttl - 1);
+        AntMessage replicatedAnt = new AntMessage(this.source, this.content, this.ttl - 1);
         replicatedAnt.hitCount = this.hitCount;
         replicatedAnt.path = new ArrayList<>(path);// Deep copy of path
         return replicatedAnt;
@@ -97,7 +89,6 @@ public class AntMessage {
         return "AntMessage{" +
                 "source=" + source +
                 ", content='" + content + '\'' +
-                ", pheromoneLevel=" + pheromoneLevel +
                 ", ttl=" + ttl +
                 ", hitCount=" + hitCount +
                 ", path=" + path +
