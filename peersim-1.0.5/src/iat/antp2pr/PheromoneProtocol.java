@@ -60,6 +60,7 @@ public class PheromoneProtocol implements Protocol, Linkable {
     Random random = new Random();
     
     private static final int DEFAULT_INITIAL_CAPACITY = 10; // default neighbor capacity
+    private static final int DEFAULT_RES_CAPACITY = 5; // default resource capacity
 
     // ----------------------------------------------------------
     // Initialization
@@ -76,6 +77,11 @@ public class PheromoneProtocol implements Protocol, Linkable {
         neighbors = new Node[Configuration.getInt(prefix + "." + PAR_INITCAP,
 			DEFAULT_INITIAL_CAPACITY)];
 	    len = 0; // neighbor count
+
+        // Initialize resources
+        for (int i = 0; i < DEFAULT_RES_CAPACITY; i++) {
+            addResource(random.nextInt());
+        }
     }
 
     // ----------------------------------------------------------

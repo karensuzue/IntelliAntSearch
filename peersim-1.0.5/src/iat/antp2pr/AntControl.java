@@ -34,6 +34,8 @@ public class AntControl implements Control {
         AntMessage msg = new AntMessage(randSrc, randSrc, 6, ttl);
         ((AntProtocol) randSrc.getProtocol(pid)).forwardAnt(randSrc, pid, msg);
 
+        // System.out.println("network size");
+        // Network.test(); Network is fine
         return false; // keeps going until time is over
     }  
 }
