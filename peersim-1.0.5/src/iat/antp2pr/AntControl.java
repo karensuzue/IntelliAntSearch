@@ -1,5 +1,7 @@
 package iat.antp2pr;
 
+import java.util.Random;
+
 import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Control;
@@ -13,6 +15,8 @@ public class AntControl implements Control {
 
     // ID of FloodingProtocol
     private final int pid;
+
+    Random random = new Random();
     
     // Constructor
     public AntControl(String prefix) {
@@ -30,8 +34,8 @@ public class AntControl implements Control {
         Node randSrc = Network.get(CommonState.r.nextInt(Network.size()));
         // Time to live for messages
         int ttl = 5; 
-        
-        AntMessage msg = new AntMessage(randSrc, randSrc, 6, ttl);
+        int randContent = random.nextInt();
+        AntMessage msg = new AntMessage(randSrc, randSrc, randContent, ttl);
         ((AntProtocol) randSrc.getProtocol(pid)).forwardAnt(randSrc, pid, msg);
 
         // System.out.println("network size");

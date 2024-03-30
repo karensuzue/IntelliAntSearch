@@ -139,6 +139,7 @@ public class AntProtocol implements EDProtocol {
         if (event instanceof AntMessage) {
             msg = (AntMessage) event;
 
+            System.out.println(msg.toString());
             forwardAnt(node, pid, msg);
         }
         else {
