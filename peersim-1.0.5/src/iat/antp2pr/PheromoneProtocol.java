@@ -11,6 +11,7 @@ import peersim.core.Linkable;
 import peersim.core.Node;
 // import peersim.edsim.EDProtocol;
 
+
 /**
  * This protocol contains the neighbor, resource, pheromone, 
  * and query hit tables for a single node in the AntP2PR routing scheme, 
@@ -18,7 +19,7 @@ import peersim.core.Node;
  * IdleProtocol, but with extra features. Should work with
  * WireGraph protocols, because it implements Linkable. 
  */
-public class PheromoneProtocol implements Linkable{
+public class PheromoneProtocol implements Linkable {
 
     // ----------------------------------------------------------
     // Config Parameters
@@ -43,9 +44,9 @@ public class PheromoneProtocol implements Linkable{
 
     // For AntP2PR implementation
     // <neighbor index (in neighbors), pheromone value>
-    protected Map<Integer, Double> pherTable = new HashMap<>(); 
+    protected Map<Node, Double> pherTable = new HashMap<>(); 
     // <neighbor index, query hit count>
-    protected Map<Integer, Integer> queryHitCount = new HashMap<>();
+    protected Map<Node, Integer> queryHitCount = new HashMap<>();
     // Resources are abstracted as unique integers
     protected List<Integer> resources = new ArrayList<>();
     // Parameters for update function
@@ -88,8 +89,8 @@ public class PheromoneProtocol implements Linkable{
      */
     public void updatePherTable() {
         // Iterate through the pherTable map
-        for (Map.Entry<Integer, Double> entry : pherTable.entrySet()) {
-            int neighbor = entry.getKey();
+        for (Map.Entry<Node, Double> entry : pherTable.entrySet()) {
+            Node neighbor = entry.getKey();
             Double pheromone = entry.getValue();
             int queryHit = queryHitCount.get(neighbor);
                     
@@ -108,11 +109,11 @@ public class PheromoneProtocol implements Linkable{
      */
     public void normalizePherTable() {
         Double sum = 0.0;
-        for (Map.Entry<Integer, Double> entry : pherTable.entrySet()) {
+        for (Map.Entry<Node, Double> entry : pherTable.entrySet()) {
             sum = sum + entry.getValue();
         }
 
-        for (Map.Entry<Integer, Double> entry : pherTable.entrySet()) {
+        for (Map.Entry<Node, Double> entry : pherTable.entrySet()) {
             pherTable.put(entry.getKey(), entry.getValue() / sum );
         } 
     }
@@ -122,7 +123,7 @@ public class PheromoneProtocol implements Linkable{
     // ----------------------------------------------------------
 
     /** Increment query hit count for neighbor */
-    public void incrementQueryHit(int neighbor) {
+    public void incrementQueryHit(Node neighbor) {
         queryHitCount.put(neighbor, queryHitCount.getOrDefault(neighbor, 0) + 1);
     }
 
@@ -149,7 +150,7 @@ public class PheromoneProtocol implements Linkable{
 
     // @Override
     // public void processEvent(Node node, int pid, Object event) {
-        // when receive success message, run updatepheromone()
+        //// when receive success message, run updatepheromone()
     // }
 
     // ----------------------------------------------------------
@@ -174,11 +175,15 @@ public class PheromoneProtocol implements Linkable{
         return neighbors[i];
     }
 
+    public Node[] getNeighbors() {
+        return neighbors;
+    }
+
     /** 
      * Adds given node if it is not already in the network. 
      * There is no limit to the number of nodes that can be 
      * added. 
-     * Called by OverlayGraph
+     * Called by OverlayGraph to instantiate network.
      */
     @Override
     public boolean addNeighbor(Node neighbor) {       
@@ -200,11 +205,11 @@ public class PheromoneProtocol implements Linkable{
 
         // Give neighbor random pheromone value 
         // HashMap dynamically resizes itself
-        pherTable.put(len, random.nextDouble());
+        pherTable.put(neighbor, random.nextDouble());
         normalizePherTable();
 
         // Initialize query hit count as 0
-        queryHitCount.put(len, 0);
+        queryHitCount.put(neighbor, 0);
 
         len++; // Update current neighbor count
 
@@ -241,7 +246,7 @@ public class PheromoneProtocol implements Linkable{
     }
 
     /** 
-     * Return a clone of the Linkable protocol. Used to instantiate nodes. 
+     * Return a clone of the protocol. Used to instantiate nodes. 
      * Invoked at any time during the simulation.
      */
     @Override 
@@ -258,14 +263,14 @@ public class PheromoneProtocol implements Linkable{
 	    pp.len = len;
 
         // Clone pheromone table
-        pp.pherTable = new HashMap<Integer, Double>();
-        for (Map.Entry<Integer, Double> entry : this.pherTable.entrySet()) {
+        pp.pherTable = new HashMap<Node, Double>();
+        for (Map.Entry<Node, Double> entry : this.pherTable.entrySet()) {
             pp.pherTable.put(entry.getKey(), entry.getValue());
         }
 
         // Clone query hit count table
-        pp.queryHitCount = new HashMap<Integer, Integer>();
-        for (Map.Entry<Integer, Integer> entry : this.queryHitCount.entrySet()) {
+        pp.queryHitCount = new HashMap<Node, Integer>();
+        for (Map.Entry<Node, Integer> entry : this.queryHitCount.entrySet()) {
             pp.queryHitCount.put(entry.getKey(), entry.getValue());
         }
         

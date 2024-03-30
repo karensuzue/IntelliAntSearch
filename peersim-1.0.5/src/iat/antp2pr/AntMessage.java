@@ -4,45 +4,67 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import peersim.core.Node;
+
 public class AntMessage {
-    private final int source;
+    private final Node source;
+    private final Node destination;
     private int content;
     private int ttl;
     private int hitCount; // if hitCount > 1, success
-    private List<Integer> path; 
+    private List<Node> path; 
 
-    public AntMessage(int source, int content, int ttl) {
+    public AntMessage(Node source, Node destination, int content, int ttl) {
         this.source = source;
+        this.destination = destination;
         this.content = content;
         this.ttl = ttl;
         this.hitCount = 0;
-        this.path = new ArrayList<Integer>();
+        this.path = new ArrayList<Node>();
     }
 
+    // ----------------------------------------------------------
+    // Source and Destination
+    // ----------------------------------------------------------
+
     // Getter for source
-    public int getSource() {
+    public Node getSource() {
         return source;
     }
+    // do we need a getdestination?
+    public Node getDestination() {
+        return destination;
+    }
+
+    // ----------------------------------------------------------
+    // Message Content
+    // ----------------------------------------------------------
 
     // Getter for content
     public int getContent() {
         return content;
     }
-    
     // Setter for content
     public void setContent(int content) {
         this.content = content;
     }
 
+    // ----------------------------------------------------------
+    // Time To Live
+    // ----------------------------------------------------------
+
     // Getter for TTL
     public int getTtl() {
         return ttl;
     }
-
     // Setter for TTL
     public void setTtl(int ttl) {
         this.ttl = ttl;
     }
+
+    // ----------------------------------------------------------
+    // Hits
+    // ----------------------------------------------------------
 
     // Getter for hitCount
     public int getHitCount() {
@@ -52,20 +74,29 @@ public class AntMessage {
     public void incrementHitCount() {
         this.hitCount++;
     }
-
-    // Method for path
-    public void addToPath(int nodeId) {
-        path.add(nodeId);
-    }
-
-    public List<Integer> getPath() {
-        return new LinkedList<>(path);
-    }
-
-    // Define the isHit method
+    // Is it successful?
     public boolean isHit() {
         return hitCount > 0;
     }
+
+    // ----------------------------------------------------------
+    // Path Traveled
+    // ----------------------------------------------------------
+
+    public void addToPath(Node node) {
+        path.add(node);
+    }
+    public List<Node> getPath() {
+        return new LinkedList<>(path);
+    }
+
+    public boolean inPath(Node node) {
+        return path.contains(node);
+    }
+
+    // ----------------------------------------------------------
+    // Other
+    // ----------------------------------------------------------
 
     // Define the getPreviousNodeIndex method
     public Integer getPreviousNodeIndex() {

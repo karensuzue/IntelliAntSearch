@@ -35,6 +35,6 @@ public class FloodingControl implements Control {
         ((FloodingProtocol) randSrc.getProtocol(pid)).floodMessage(randSrc, pid, msg);
         // Schedule the flooding event to occur
         // EDSimulator.add(interval, msg, randSrc, pid);
-        return false;
+        return false; // keeps going until time is over
     }
 }
