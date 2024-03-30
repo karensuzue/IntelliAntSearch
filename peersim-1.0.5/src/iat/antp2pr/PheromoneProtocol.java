@@ -9,7 +9,7 @@ import java.util.Random;
 import peersim.config.Configuration;
 import peersim.core.Linkable;
 import peersim.core.Node;
-// import peersim.edsim.EDProtocol;
+import peersim.core.Protocol;
 
 
 /**
@@ -19,7 +19,7 @@ import peersim.core.Node;
  * IdleProtocol, but with extra features. Should work with
  * WireGraph protocols, because it implements Linkable. 
  */
-public class PheromoneProtocol implements Linkable {
+public class PheromoneProtocol implements Protocol, Linkable {
 
     // ----------------------------------------------------------
     // Config Parameters

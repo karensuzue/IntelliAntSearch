@@ -3,6 +3,7 @@ package iat.antp2pr;
 import java.util.List;
 
 import peersim.config.Configuration;
+import peersim.core.Linkable;
 import peersim.core.Node;
 import peersim.core.Protocol;
 import peersim.edsim.EDProtocol;
@@ -80,13 +81,12 @@ public class AntProtocol implements EDProtocol {
         msg.addToPath(node);
 
         // Check if linkable is of type PheromoneProtocol
-        Protocol tempProtocol = node.getProtocol(linkablePid);
-        if (!(tempProtocol instanceof PheromoneProtocol)) {
-            throw new IllegalArgumentException("Unexpected linkable type: " + tempProtocol.getClass().getName()
+        if (!(node.getProtocol(linkablePid) instanceof PheromoneProtocol)) {
+            throw new IllegalArgumentException("Unexpected linkable type: " + node.getProtocol(linkablePid).getClass().getName()
                 + ", must be of type PheromoneProtocol");
         }
         // PheromoneProtocol for current node
-        PheromoneProtocol pherProtocol = (PheromoneProtocol) tempProtocol;
+        PheromoneProtocol pherProtocol = (PheromoneProtocol) node.getProtocol(linkablePid);
 
         // If resource is found in current node, update query hits and pherTables
         // Only successful node knows the full path
