@@ -286,6 +286,13 @@ public class PheromoneProtocol implements Protocol, Linkable {
         // Clone length
 	    pp.len = len;
 
+        // Clone resources table, but randomize
+        pp.resources = new ArrayList<>();
+        // Initialize resources
+            for (int i = 0; i < DEFAULT_RES_CAPACITY; i++) {
+                pp.addResource(random.nextInt());
+            }
+
         // Clone pheromone table
         pp.pherTable = new HashMap<Node, Double>();
         for (Map.Entry<Node, Double> entry : this.pherTable.entrySet()) {
