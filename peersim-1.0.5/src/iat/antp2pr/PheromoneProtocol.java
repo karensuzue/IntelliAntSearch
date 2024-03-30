@@ -118,6 +118,24 @@ public class PheromoneProtocol implements Linkable {
         } 
     }
 
+    public Double getPheromone(Node node) {
+        if (pherTable.containsKey(node)) {
+            // Retrieve and return the pheromone value associated with the node
+            return pherTable.get(node);
+        } else {
+            // If the node is not found in the pherTable
+            throw new IllegalArgumentException("Node not found in the pherTable");
+        }   
+    }
+
+    public Double getLowBound() {
+        return low;
+    }
+
+    public Double getHighBound() {
+        return high;
+    }
+
     // ----------------------------------------------------------
     // Query Hit Table Methods
     // ----------------------------------------------------------

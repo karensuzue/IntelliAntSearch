@@ -98,18 +98,9 @@ public class AntMessage {
     // Other
     // ----------------------------------------------------------
 
-    // Define the getPreviousNodeIndex method
-    public Integer getPreviousNodeIndex() {
-        if (path.isEmpty()) {
-            return null;
-        } else {
-            return path.get(path.size() - 1);
-        }
-    }
-
     // Method to replicate this ant for sending to another node, with deep copy of path
     public AntMessage replicateForForwarding() {
-        AntMessage replicatedAnt = new AntMessage(this.source, this.content, this.ttl - 1);
+        AntMessage replicatedAnt = new AntMessage(this.source, this.destination, this.content, this.ttl - 1);
         replicatedAnt.hitCount = this.hitCount;
         replicatedAnt.path = new ArrayList<>(path);// Deep copy of path
         return replicatedAnt;
