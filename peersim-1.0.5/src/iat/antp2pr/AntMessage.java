@@ -109,11 +109,11 @@ public class AntMessage {
     @Override
     public String toString() {
         return "AntMessage{" +
-                "source=" + source +
+                "source=" + source.getID() +
                 ", content='" + content + '\'' +
                 ", ttl=" + ttl +
                 ", hitCount=" + hitCount +
-                ", path=" + path +
+                //", path=" + path +
                 '}';
     }
 }

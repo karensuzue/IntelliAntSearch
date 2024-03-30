@@ -34,7 +34,7 @@ public class AntControl implements Control {
         Node randSrc = Network.get(CommonState.r.nextInt(Network.size()));
         // Time to live for messages
         int ttl = 5; 
-        int randContent = random.nextInt();
+        int randContent = random.nextInt(5);
         AntMessage msg = new AntMessage(randSrc, randSrc, randContent, ttl);
         ((AntProtocol) randSrc.getProtocol(pid)).forwardAnt(randSrc, pid, msg);
 
