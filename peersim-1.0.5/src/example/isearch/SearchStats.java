@@ -18,6 +18,8 @@
 
 package example.isearch;
 
+import peersim.core.Network;
+
 /**
  * A class of this type is instantiated for each time a dinstinct packet is
  * discovered. It stores statistics for each packet.
@@ -82,7 +84,7 @@ public class SearchStats {
         this.hitRate = (double) nbHits / (double) nbSeen;
 
         // Update the network load
-        this.networkLoad = (double) nbMessages / (double) nbSeen;
+        this.networkLoad = (double) nbSeen / (double) Network.size();
     }
 
     public String toString() {
