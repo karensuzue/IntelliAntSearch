@@ -1,0 +1,32 @@
+AntMessage{source=0, content='32', ttl=5, hitCount=0, path=[0]}
+AntMessage{source=0, content='32', ttl=4, hitCount=0, path=[0, 4]}
+AntMessage{source=0, content='32', ttl=4, hitCount=0, path=[0, 2]}
+AntMessage{source=0, content='32', ttl=3, hitCount=0, path=[0, 2, 4]}
+AntMessage{source=0, content='32', ttl=4, hitCount=0, path=[0, 2, 1]}
+AntMessage{source=0, content='32', ttl=5, hitCount=0, path=[0, 3]}
+AntMessage{source=0, content='32', ttl=5, hitCount=0, path=[0, 3, 2]}
+AntMessage{source=0, content='32', ttl=4, hitCount=0, path=[0, 3, 2, 1]}
+AntMessage{source=0, content='32', ttl=4, hitCount=0, path=[0, 3, 2, 4]}
+AntMessage{source=0, content='32', ttl=3, hitCount=0, path=[0, 3, 2, 4, 1]}
+AntMessage{source=0, content='32', ttl=3, hitCount=0, path=[0, 2, 3]}
+AntMessage{source=0, content='32', ttl=2, hitCount=0, path=[0, 2, 3, 1]}
+AntMessage{source=0, content='32', ttl=3, hitCount=0, path=[0, 4, 1]}
+AntMessage{source=0, content='32', ttl=4, hitCount=0, path=[0, 4, 2]}
+AntMessage{source=0, content='32', ttl=3, hitCount=0, path=[0, 4, 2, 3]}
+AntMessage{source=0, content='32', ttl=2, hitCount=0, path=[0, 4, 2, 3, 1]}
+AntMessage{source=0, content='32', ttl=3, hitCount=0, path=[0, 4, 2, 1]}
+AntMessage{source=0, content='32', ttl=4, hitCount=0, path=[0, 3, 4]}
+AntMessage{source=0, content='32', ttl=3, hitCount=0, path=[0, 3, 4, 1]}
+AntMessage{source=0, content='32', ttl=3, hitCount=0, path=[0, 3, 4, 2]}
+AntMessage{source=0, content='32', ttl=2, hitCount=0, path=[0, 3, 4, 2, 1]}
+AntMessage{source=0, content='32', ttl=3, hitCount=0, path=[0, 4, 3]}
+AntMessage{source=0, content='32', ttl=2, hitCount=0, path=[0, 4, 3, 1]}
+AntMessage{source=0, content='32', ttl=2, hitCount=0, path=[0, 4, 3, 2]}
+AntMessage{source=0, content='32', ttl=1, hitCount=0, path=[0, 4, 3, 2, 1]}
+AntMessage{source=0, content='32', ttl=2, hitCount=0, path=[0, 2, 4, 1]}
+AntMessage{source=0, content='32', ttl=4, hitCount=0, path=[0, 1]}
+AntMessage{source=0, content='32', ttl=2, hitCount=0, path=[0, 2, 3, 4]}
+AntMessage{source=0, content='32', ttl=1, hitCount=0, path=[0, 2, 3, 4, 1]}
+AntMessage{source=0, content='32', ttl=4, hitCount=0, path=[0, 3, 1]}
+AntMessage{source=0, content='32', ttl=2, hitCount=0, path=[0, 2, 4, 3]}
+AntMessage{source=0, content='32', ttl=1, hitCount=0, path=[0, 2, 4, 3, 1]}

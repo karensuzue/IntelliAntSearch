@@ -1,23 +1,46 @@
+import networkx as nx
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
+import re
 
-data = pd.read_csv('graph.dat', sep=' ', header=None, names=['X', 'Y'])
+def parse_log_output(log_output):
+    paths = []
+    # Regex to find numeric sequences inside brackets
+    path_regex = re.compile(r'path=\[(.*?)\]')
+    for line in log_output.split('\n'):
+        match = path_regex.search(line)
+        if match:
+            path_str = match.group(1)
+            path = [int(node) for node in path_str.split(", ") if node.isdigit()]
+            paths.append(path)
+    return paths
 
-# Extract unique nodes
-unique_nodes = data.drop_duplicates()
+with open("log.txt", "r") as f:
+    data = f.read()
+    
 
-# Print coordinates and annotate nodes
+# Parse the updated log output to get paths
+paths = parse_log_output(data)
 
-plt.scatter(unique_nodes['X'], unique_nodes['Y'])
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.title('P2P Network Topology')
-plt.grid(True)
+# Create a directed graph
+G = nx.DiGraph()
 
-# Draw connections between consecutive points
-for i in range(0, len(data) - 1, 2):
-    plt.plot([data.iloc[i]['X'], data.iloc[i + 1]['X']], [data.iloc[i]['Y'], data.iloc[i + 1]['Y']], 'k-')
+# Add directed edges based on paths
+for path in paths:
+    for i in range(len(path) - 1):
+        G.add_edge(path[i], path[i+1])
 
+# Choose a layout for our graph
+pos = nx.spring_layout(G, k=0.15, iterations=20)  # k: Optimal distance between nodes. Increase to spread out nodes
 
+# Create figure with specified size and layout management
+plt.figure(figsize=(15, 10), constrained_layout=True)
+
+# Draw the directed network with arrows
+nx.draw(G, pos, with_labels=True, node_size=250, node_color='skyblue', font_size=10, font_weight='bold',
+        edge_color='gray', width=0.5, alpha=0.7, arrows=True, arrowsize=10, arrowstyle='-|>')
+
+# Save the plot to a file
+plt.savefig("network_graph.png", format="PNG")
+
+# Show the plot
 plt.show()

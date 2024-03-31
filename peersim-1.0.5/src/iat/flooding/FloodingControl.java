@@ -21,10 +21,10 @@ public class FloodingControl implements Control {
     }
 
     /**
-     * Overrides Control's execute()
      * In Cycle-Driven simulations, execute() is invoked once per cycle (WIP)
      * In Event-Driven simulations, execute() is invoked once at the beginning?
      */
+    @Override
     public boolean execute() {
         // Trigger the flooding protocol from a random node
         Node randSrc = Network.get(CommonState.r.nextInt(Network.size()));
@@ -35,6 +35,6 @@ public class FloodingControl implements Control {
         ((FloodingProtocol) randSrc.getProtocol(pid)).floodMessage(randSrc, pid, msg);
         // Schedule the flooding event to occur
         // EDSimulator.add(interval, msg, randSrc, pid);
-        return false;
+        return false; // keeps going until time is over
     }
 }
