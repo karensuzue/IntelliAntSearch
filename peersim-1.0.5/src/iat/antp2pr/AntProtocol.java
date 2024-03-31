@@ -117,7 +117,6 @@ public class AntProtocol implements EDProtocol {
 
          // If resource is found in current node, update query hits and pherTables
         // Only successful node knows the full path
-        // Don't forward message regardless of TTL
         if (pherProtocol.hasResource(msg.getContent())) {
             // System.out.println("Has Content");
             // Increment hit count of message
@@ -147,11 +146,12 @@ public class AntProtocol implements EDProtocol {
         }
 
         // If resource isn't found in current node, forward message to other nodes
-        else {
-            // System.out.println("Doesn't Have Content");
+        // else {
+            // System.out.println("Doesn't Have Content"); 
+            // even if a hit is found, keep routing until TTL expires
 
             messageRouting(pherProtocol, node, pid, msg); // Algorithm 3
-        } 
+        // } 
     }
 
 

@@ -33,7 +33,7 @@ public class AntControl implements Control {
          // Trigger the flooding protocol from a random node
         Node randSrc = Network.get(CommonState.r.nextInt(Network.size()));
         // Time to live for messages
-        int ttl = 5; 
+        int ttl = 3; 
 
         AntMessage msg = new AntMessage(randSrc, randSrc, PheromoneProtocol.nextRandomResource(), ttl);
         ((AntProtocol) randSrc.getProtocol(pid)).forwardAnt(randSrc, pid, msg);
