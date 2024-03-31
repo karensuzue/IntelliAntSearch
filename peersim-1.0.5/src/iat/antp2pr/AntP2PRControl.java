@@ -1,18 +1,17 @@
-package example.dlant;
-import peersim.core.Node;
+package iat.antp2pr;
 
 import java.util.Random;
 
 import peersim.config.Configuration;
+import peersim.core.CommonState;
 import peersim.core.Control;
 import peersim.core.Network;
-import peersim.core.CommonState; // Import CommonState
+import peersim.core.Node;
 
-public class DLAntControl implements Control {
-
+public class AntP2PRControl implements Control {
     private final int pid;
 
-    public DLAntControl(String prefix) {
+    public AntP2PRControl(String prefix) {
         pid = Configuration.getPid(prefix + ".protocol");
     }
 
@@ -30,8 +29,8 @@ public class DLAntControl implements Control {
 
         System.out.println("Starting search from node " + startNode.getIndex());
 
-        DLAntProtocol protocol = (DLAntProtocol) startNode.getProtocol(pid);
-        protocol.startAntSearch(startNode, new Random().nextInt( Network.size()), pid); 
+        AntP2PRProtocol protocol = (AntP2PRProtocol) startNode.getProtocol(pid);
+        protocol.startAntSearch(startNode, new Random().nextInt(Network.size()), pid); 
 
         return false;
     }

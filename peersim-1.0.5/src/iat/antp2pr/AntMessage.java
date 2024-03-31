@@ -72,7 +72,7 @@ public class AntMessage {
     }
     // Increment hitCount
     public void incrementHitCount() {
-        this.hitCount++;
+        hitCount++;
     }
     // Is it successful?
     public boolean isHit() {
@@ -100,20 +100,27 @@ public class AntMessage {
 
     // Method to replicate this ant for sending to another node, with deep copy of path
     public AntMessage replicateForForwarding() {
-        AntMessage replicatedAnt = new AntMessage(this.source, this.destination, this.content, this.ttl - 1);
+        AntMessage replicatedAnt = new AntMessage(this.source, this.destination, this.content, this.ttl);
         replicatedAnt.hitCount = this.hitCount;
         replicatedAnt.path = new ArrayList<>(path);// Deep copy of path
+
         return replicatedAnt;
     }
 
     @Override
     public String toString() {
+        ArrayList<Long> pathIDs = new ArrayList<>();
+
+        for (Node node : path) {
+            pathIDs.add(node.getID());
+        }
+
         return "AntMessage{" +
                 "source=" + source.getID() +
                 ", content='" + content + '\'' +
                 ", ttl=" + ttl +
                 ", hitCount=" + hitCount +
-                //", path=" + path +
+                ", path=" + pathIDs +
                 '}';
     }
 }
