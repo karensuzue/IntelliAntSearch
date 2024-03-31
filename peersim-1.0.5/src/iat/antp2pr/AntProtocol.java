@@ -23,8 +23,6 @@ public class AntProtocol implements EDProtocol {
     private final int linkablePid;
     private final int transportPid;
 
-    PrintStream fileStream;
-
     // Constructor
     public AntProtocol(String prefix) {
         transportPid = Configuration.getPid(prefix + "." + PAR_TRANSPORT);
@@ -89,16 +87,22 @@ public class AntProtocol implements EDProtocol {
         // Message has arrived at current node, add to path
         msg.addToPath(node);
 
+        FileOutputStream fos = null;
+
         try {
-            String fname = "output.txt"; // "output.txt
-            FileOutputStream fos = new FileOutputStream(fname, true);
-            System.out.println("Writing to file " + fname);
+            String fname = "log.txt"; // "output.txt
+            fos = new FileOutputStream(fname, true);
             PrintStream pstr = new PrintStream(fos);
 
             pstr.println(msg.toString());
 
             fos.close();
         } catch (IOException e) {
+            if (fos != null) {
+                try { fos.close(); } 
+                catch (IOException e1) { }
+            }
+
             throw new RuntimeException(e);
         }
 

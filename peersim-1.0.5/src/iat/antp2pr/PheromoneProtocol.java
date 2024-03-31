@@ -60,7 +60,9 @@ public class PheromoneProtocol implements Protocol, Linkable {
     protected int len;
     
     private static final int DEFAULT_INITIAL_CAPACITY = 10; // default neighbor capacity
-    private static final int DEFAULT_RES_CAPACITY = 5; // default resource capacity
+    private static final int MIN_RES_CAPACITY = 1; // min resource capacity
+    private static final int MAX_RES_CAPACITY = 10; // max resource capacity
+
     private static final int POSSIBLE_RESOURCES = 50;
 
     private Random random = new Random();
@@ -81,8 +83,10 @@ public class PheromoneProtocol implements Protocol, Linkable {
 			DEFAULT_INITIAL_CAPACITY)];
 	    len = 0; // neighbor count
 
+        int resource_capacity = random.nextInt(MAX_RES_CAPACITY - MIN_RES_CAPACITY + 1) + MIN_RES_CAPACITY;
+
         // Initialize resources
-        for (int i = 0; i < DEFAULT_RES_CAPACITY; i++) {
+        for (int i = 0; i < resource_capacity; i++) {
             addResource(nextRandomResource());
         }
     }
@@ -294,8 +298,10 @@ public class PheromoneProtocol implements Protocol, Linkable {
         // Clone resources table, but randomize
         pp.resources = new ArrayList<>();
 
+        int resource_capacity = random.nextInt(MAX_RES_CAPACITY - MIN_RES_CAPACITY + 1) + MIN_RES_CAPACITY;
+
         // Initialize resources
-        for (int i = 0; i < DEFAULT_RES_CAPACITY; i++) {
+        for (int i = 0; i < resource_capacity; i++) {
             pp.addResource(nextRandomResource());
         }
 
