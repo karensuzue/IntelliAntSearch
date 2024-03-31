@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.Random;
 
 import peersim.config.Configuration;
+import peersim.core.CommonState;
 import peersim.core.Linkable;
+import peersim.core.Network;
 import peersim.core.Node;
 import peersim.core.Protocol;
 
@@ -56,11 +58,12 @@ public class PheromoneProtocol implements Protocol, Linkable {
     protected Node[] neighbors;
     // Length of neighbors, pherTable, and queryHitCount
     protected int len;
-
-    Random random = new Random();
     
     private static final int DEFAULT_INITIAL_CAPACITY = 10; // default neighbor capacity
     private static final int DEFAULT_RES_CAPACITY = 5; // default resource capacity
+    private static final int POSSIBLE_RESOURCES = 50;
+
+    private Random random = new Random();
 
     // ----------------------------------------------------------
     // Initialization
@@ -80,9 +83,11 @@ public class PheromoneProtocol implements Protocol, Linkable {
 
         // Initialize resources
         for (int i = 0; i < DEFAULT_RES_CAPACITY; i++) {
-            addResource(random.nextInt());
+            addResource(nextRandomResource());
         }
     }
+
+    
 
     // ----------------------------------------------------------
     // Pheromone Table Methods
@@ -288,10 +293,11 @@ public class PheromoneProtocol implements Protocol, Linkable {
 
         // Clone resources table, but randomize
         pp.resources = new ArrayList<>();
+
         // Initialize resources
-            for (int i = 0; i < DEFAULT_RES_CAPACITY; i++) {
-                pp.addResource(random.nextInt());
-            }
+        for (int i = 0; i < DEFAULT_RES_CAPACITY; i++) {
+            pp.addResource(nextRandomResource());
+        }
 
         // Clone pheromone table
         pp.pherTable = new HashMap<Node, Double>();
@@ -306,5 +312,16 @@ public class PheromoneProtocol implements Protocol, Linkable {
         }
         
 	    return pp;
+    }
+
+
+    // ----------------------------------------------------------
+    // Utililty Methods
+    // ----------------------------------------------------------
+
+
+    public static int nextRandomResource() {
+        Random random = new Random();
+        return random.nextInt(POSSIBLE_RESOURCES);
     }
 }

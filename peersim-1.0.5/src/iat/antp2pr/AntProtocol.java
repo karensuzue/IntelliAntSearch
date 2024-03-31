@@ -1,5 +1,8 @@
 package iat.antp2pr;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.List;
 
 import peersim.config.Configuration;
@@ -20,10 +23,14 @@ public class AntProtocol implements EDProtocol {
     private final int linkablePid;
     private final int transportPid;
 
+    PrintStream fileStream;
+
     // Constructor
     public AntProtocol(String prefix) {
         transportPid = Configuration.getPid(prefix + "." + PAR_TRANSPORT);
         linkablePid = Configuration.getPid(prefix + "." + PAR_LINKABLE);
+
+
     }
 
     /**
@@ -42,6 +49,8 @@ public class AntProtocol implements EDProtocol {
             Double pheromone = pherProtocol.getPheromone(neighbor);
             Double low_bound = pherProtocol.getLowBound();
             Double high_bound = pherProtocol.getHighBound();
+
+            // System.out.println("Pheromone: " + pheromone + " Low Bound: " + low_bound + " High Bound: " + high_bound);
 
             // Check if the neighbor is not the source of the message
             if (!neighbor.equals(msg.getSource())) {
@@ -80,6 +89,20 @@ public class AntProtocol implements EDProtocol {
         // Message has arrived at current node, add to path
         msg.addToPath(node);
 
+        try {
+            String fname = "output.txt"; // "output.txt
+            FileOutputStream fos = new FileOutputStream(fname, true);
+            System.out.println("Writing to file " + fname);
+            PrintStream pstr = new PrintStream(fos);
+
+            pstr.println(msg.toString());
+
+            fos.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
         // Check if linkable is of type PheromoneProtocol
         if (!(node.getProtocol(linkablePid) instanceof PheromoneProtocol)) {
             throw new IllegalArgumentException("Unexpected linkable type: " + node.getProtocol(linkablePid).getClass().getName()
@@ -88,10 +111,11 @@ public class AntProtocol implements EDProtocol {
         // PheromoneProtocol for current node
         PheromoneProtocol pherProtocol = (PheromoneProtocol) node.getProtocol(linkablePid);
 
-        // If resource is found in current node, update query hits and pherTables
+         // If resource is found in current node, update query hits and pherTables
         // Only successful node knows the full path
         // Don't forward message regardless of TTL
         if (pherProtocol.hasResource(msg.getContent())) {
+            // System.out.println("Has Content");
             // Increment hit count of message
             msg.incrementHitCount();
             // Get path of message
@@ -112,11 +136,16 @@ public class AntProtocol implements EDProtocol {
                         pathNodePherProtocol.incrementQueryHit(p);
                     }
                 }
+
+                pathNodePherProtocol.updatePherTable(); // Update pheromone table of pathNode
+                pathNodePherProtocol.normalizePherTable(); // Normalize pheromone table of pathNode
             }
         }
 
         // If resource isn't found in current node, forward message to other nodes
         else {
+            // System.out.println("Doesn't Have Content");
+
             messageRouting(pherProtocol, node, pid, msg); // Algorithm 3
         } 
     }
@@ -138,6 +167,8 @@ public class AntProtocol implements EDProtocol {
         AntMessage msg;
         if (event instanceof AntMessage) {
             msg = (AntMessage) event;
+
+            if (msg.inPath(node)) { return; } // Avoid loops
 
             if (msg.isHit()) {
                 System.out.println(msg.toString());
