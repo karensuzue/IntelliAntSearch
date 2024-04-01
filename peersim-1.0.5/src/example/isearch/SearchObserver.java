@@ -141,7 +141,7 @@ public class SearchObserver implements Control {
  
             // System.out.println(name + ": " + CommonState.getIntTime() + " "
             //         + stats.toString());
-            System.out.println(stats);
+            // System.out.println(stats);
         }
 
         System.out.println("Hit Rate Avg: " + hitRate.getAverage()  + " Network Load Avg: " + networkLoad.getAverage());
