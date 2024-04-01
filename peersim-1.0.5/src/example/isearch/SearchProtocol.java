@@ -249,6 +249,7 @@ public abstract class SearchProtocol implements CDProtocol, Linkable {
             try {
                 // clone message and update TTL:
                 SMessage copy = (SMessage) mes.clone();
+                mes.addToPath(n);
                 copy.hops++;
                 SearchProtocol sp = (SearchProtocol) n.getProtocol(pid);
                 // copy.type = SMessage.FWD; // sets FWD type
@@ -436,10 +437,13 @@ public abstract class SearchProtocol implements CDProtocol, Linkable {
     protected int[] pickQueryData() {
         int[] result = null;
 
+
         if (queryDistro.isEmpty())
             return null;
 
+
         Integer key = (Integer) queryDistro.firstKey();
+        
         // new Integer(CommonState.getT());
         if (key.intValue() == CDState.getCycle()) {
             result = (int[]) queryDistro.get(key);

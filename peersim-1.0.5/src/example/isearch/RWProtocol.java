@@ -69,7 +69,7 @@ public class RWProtocol extends SearchProtocol {
 
         int[] data = this.pickQueryData(); // if we have to produce a query...
         if (data != null) {
-            SMessage m = new SMessage(node, SMessage.QRY, 0, data);
+            SMessage m = new SMessage(node, SMessage.QRY, 0, data, ttl);
             // System.err.println("sending to " + view.size() + " neighbours: "
             // + m);
             // produces the specified number of walkers:

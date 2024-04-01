@@ -1,5 +1,8 @@
 package example.isearch;
 
+import peersim.cdsim.CDSimulator;
+import peersim.cdsim.CDState;
+import peersim.core.CommonState;
 import peersim.core.Node;
 
 public class FloodProtocol extends SearchProtocol {
@@ -12,22 +15,27 @@ public class FloodProtocol extends SearchProtocol {
         if (match)
             this.notifyOriginator(mes);
 
-        // forwards the message to a random neighbor:
-        Node neighbor = this.getRNDNeighbor();
+        for (int i = 0; i < CommonState.r.nextInt(this.degree()) + 1; i++) {
+            Node n = this.getRNDNeighbor();
 
-        this.forward(neighbor, mes);
+            if (mes.originator == n || mes.hasVisited(n)) continue;
+
+            this.forward(n, mes);
+        }
     }
 
-    public void nextCycle(Node node, int protocolID) {
+    public void nextCycle(Node node, int protocolID) { 
         super.nextCycle(node, protocolID);
-
+        
         int[] data = this.pickQueryData();
+
         if (data != null) {
-            SMessage m = new SMessage(node, SMessage.QRY, 0, data);
+            SMessage m = new SMessage(node, SMessage.QRY, 0, data, ttl);
 
             for (int i = 0; i < this.degree(); i++) {
                 this.send((Node) this.getNeighbor(i), m);
             }
         }
+        
     }
 }

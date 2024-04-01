@@ -46,14 +46,18 @@ public class SearchStats {
     private int seq;
 
     /** Age of this query */
-    private int age;
+    public int age;
 
     /** Time to live of this query */
-    private int ttl;
+    public int ttl;
 
-    private double hitRate;
+    public double hitRate;
 
-    private double networkLoad;
+    public double networkLoad;
+
+    public double avgHopCount;
+
+    public double avgHopsBeforeHit;
 
     // ---------------------------------------------------------------------
     // Initialization
@@ -64,6 +68,8 @@ public class SearchStats {
         this.nbHits = 0;
         this.hitRate = 0.0;
         this.networkLoad = 0.0;
+        this.avgHopCount = 0.0;
+        this.avgHopsBeforeHit = 0.0;
         this.nbMessages = 0;
         // this.nbExtraProbes = 0;
         this.seq = seq;
@@ -79,17 +85,32 @@ public class SearchStats {
         ++nbSeen;
         nbHits += hits;
         nbMessages += msgs;
+
+        if (hits > 0 && this.avgHopsBeforeHit <= 0) {
+            this.avgHopsBeforeHit += nbSeen;
+        }
         
         // Update the hit rate
         this.hitRate = (double) nbHits / (double) nbSeen;
 
         // Update the network load
         this.networkLoad = (double) nbSeen / (double) Network.size();
+
+        // Update the average hop count
+        this.avgHopCount = (double) nbMessages / (double) nbSeen;
     }
 
     public String toString() {
+        // Round the values to 2 decimal places
+        double _hitRate = Math.round(hitRate * 100.0) / 100.0;
+        double _networkLoad = Math.round(networkLoad * 100.0) / 100.0;
+        double _avgHopCount = Math.round(avgHopCount * 100.0) / 100.0;
+        double _avgHopsBeforeHit = Math.round(avgHopsBeforeHit * 100.0) / 100.0;
+
+
+        return "Seq(" + seq + ") TTL(" + (ttl - age) + ") #Seen(" + nbSeen + ") #Hits(" + nbHits + ") #Messages(" + nbMessages + ") HitRate(" + _hitRate + ") NetworkLoad(" + _networkLoad + ") AvgHopCount(" + _avgHopCount + ") AvgHopsBeforeHit(" + _avgHopsBeforeHit + ")";
         // Print the sequence number, the age, the number of nodes that have with labels
-        return "Seq: " + seq + " Age: " + age + " #Seen: " + nbSeen + " #Hits: " + nbHits + " #Messages: " + nbMessages + " HitRate: " + hitRate + " NetworkLoad: " + networkLoad;
+        // return "Seq: " + seq + " Age: " + age + " #Seen: " + nbSeen + " #Hits: " + nbHits + " #Messages: " + nbMessages + " HitRate: " + hitRate + " NetworkLoad: " + networkLoad;
 
         // return ("" + seq + "\t" + age + "\t" + nbSeen + "\t" + nbHits + "\t" + nbMessages);
     }

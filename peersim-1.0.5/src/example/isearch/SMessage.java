@@ -18,6 +18,9 @@
 
 package example.isearch;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import peersim.cdsim.CDState;
 import peersim.core.Node;
 
@@ -39,33 +42,63 @@ public class SMessage implements Cloneable {
 
     private static int seq_generator = 0;
 
-    public int hops, type, seq, start;
+    public int hops, type, seq, start, ttl;
 
     public Node originator; // the query producer
 
     public int[] payload; // an array of keys
 
+    public List<Node> path; // the path followed by the message
+
     // ---------------------------------------------------------------------
     // Initialization
     // ---------------------------------------------------------------------
 
-    public SMessage(Node originator, int type, int hops, int[] payload) {
+    public SMessage(Node originator, int type, int hops, int[] payload, int ttl) {
         this.originator = originator;
+        this.path = new ArrayList<>();
         this.type = type;
         this.hops = hops;
+        this.ttl = ttl;
         this.payload = payload;
         this.seq = ++seq_generator;
         this.start = CDState.getCycle();
+
+        this.path.add(originator);
     }
 
     public Object clone() throws CloneNotSupportedException {
-        SMessage m = (SMessage) super.clone();
-        return m;
+        SMessage msg = (SMessage) super.clone();
+
+        msg.ttl--;
+        msg.path = new ArrayList<>(path);
+
+        return msg;
+    }
+
+    public SMessage copy() {
+        try {
+            return (SMessage) this.clone();
+        } catch (CloneNotSupportedException e) {
+            SMessage msg =  new SMessage(originator, type, hops, payload, ttl - 1);
+
+            msg.path = new ArrayList<>(path);
+
+            return msg;
+        }
     }
 
     // ---------------------------------------------------------------------
     // Methods
     // ---------------------------------------------------------------------
+
+    public void addToPath(Node node) {
+        path.add(node);
+    }
+
+    public boolean hasVisited(Node node) {
+        return path.contains(node);
+    }
 
     public int hashCode() {
         return seq;

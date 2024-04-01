@@ -26,6 +26,7 @@ import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Control;
 import peersim.core.Network;
+import peersim.util.IncrementalStats;
 
 public class SearchObserver implements Control {
     // ---------------------------------------------------------------------
@@ -123,14 +124,27 @@ public class SearchObserver implements Control {
 
     public void printItemsStatistics(HashMap messageStats) {
         Iterator iterStats = messageStats.values().iterator();
+        IncrementalStats hitRate = new IncrementalStats();
+        IncrementalStats networkLoad = new IncrementalStats();
+
         while (iterStats.hasNext()) {
             SearchStats stats = (SearchStats) iterStats.next();
+
             if (verbosity == 0 && stats.getAge() < stats.getTtl())
                 continue;
-            System.out.println(name + ": " + CommonState.getIntTime() + " "
-                    + stats.toString());
-            // System.out.println(stats);
+
+            hitRate.add(stats.hitRate);
+            networkLoad.add(stats.networkLoad);
+            
+            // incrementalStats.add(stats.networkLoad);
+            // incrementalStats.add(stats.avgHopCount);
+ 
+            // System.out.println(name + ": " + CommonState.getIntTime() + " "
+            //         + stats.toString());
+            System.out.println(stats);
         }
+
+        System.out.println("Hit Rate Avg: " + hitRate.getAverage()  + " Network Load Avg: " + networkLoad.getAverage());
     }
 
 }
