@@ -70,7 +70,6 @@ public class SMessage implements Cloneable {
     public Object clone() throws CloneNotSupportedException {
         SMessage msg = (SMessage) super.clone();
 
-        msg.ttl--;
         msg.path = new ArrayList<>(path);
 
         return msg;
@@ -80,7 +79,7 @@ public class SMessage implements Cloneable {
         try {
             return (SMessage) this.clone();
         } catch (CloneNotSupportedException e) {
-            SMessage msg =  new SMessage(originator, type, hops, payload, ttl - 1);
+            SMessage msg =  new SMessage(originator, type, hops, payload, ttl);
 
             msg.path = new ArrayList<>(path);
 

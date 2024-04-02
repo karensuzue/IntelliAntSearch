@@ -245,27 +245,25 @@ public abstract class SearchProtocol implements CDProtocol, Linkable {
         // NOTE: it does not insert the message in the neighbor messageTable
         // because I belive that this operation has to performed by the
         // neighbor itselt; the idea is that a node has "to see" by itself.
-        if (mes.hops < ttl) {
-            try {
-                // clone message and update TTL:
-                SMessage copy = (SMessage) mes.clone();
-                mes.addToPath(n);
-                copy.hops++;
-                SearchProtocol sp = (SearchProtocol) n.getProtocol(pid);
-                // copy.type = SMessage.FWD; // sets FWD type
-                // System.err.println(
-                // "forward: "
-                // + currentIndex
-                // + " -> "
-                // + n.getIndex()
-                // + ": "
-                // + copy);
-                // store to whom the message is sent and how many copies
-                updateRoutingTable(n, mes);
-                sp.incomingQueue.add(copy);
-            } catch (CloneNotSupportedException cnse) {
-                System.out.println("Troubles with message cloning...!");
-            }
+        if (mes.ttl > 0) {        
+            // clone message and update TTL:
+            SMessage copy = mes.copy();
+            mes.addToPath(n);
+            copy.hops++;
+            copy.ttl--;
+            
+            SearchProtocol sp = (SearchProtocol) n.getProtocol(pid);
+            // copy.type = SMessage.FWD; // sets FWD type
+            // System.err.println(
+            // "forward: "
+            // + currentIndex
+            // + " -> "
+            // + n.getIndex()
+            // + ": "
+            // + copy);
+            // store to whom the message is sent and how many copies
+            updateRoutingTable(n, mes);
+            sp.incomingQueue.add(copy);
         }
     }
 

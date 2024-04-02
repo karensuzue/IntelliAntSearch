@@ -15,8 +15,8 @@ public class FloodProtocol extends SearchProtocol {
         if (match)
             this.notifyOriginator(mes);
 
-        for (int i = 0; i < CommonState.r.nextInt(this.degree()) + 1; i++) {
-            Node n = this.getRNDNeighbor();
+        for (int i = 0; i < this.degree(); i++) {
+            Node n = (Node) this.getNeighbor(i);
 
             if (mes.originator == n || mes.hasVisited(n)) continue;
 

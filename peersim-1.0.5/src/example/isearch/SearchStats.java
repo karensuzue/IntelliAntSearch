@@ -38,7 +38,7 @@ public class SearchStats {
     private int nbHits;
 
     /** Number of messages sent on behalf of this query */
-    private int nbMessages;
+    public int nbMessages;
 
     /** Number of extra probes sent on behalf of this query */
     // private int nbExtraProbes;
@@ -85,10 +85,6 @@ public class SearchStats {
         ++nbSeen;
         nbHits += hits;
         nbMessages += msgs;
-
-        if (hits > 0 && this.avgHopsBeforeHit <= 0) {
-            this.avgHopsBeforeHit += nbSeen;
-        }
         
         // Update the hit rate
         this.hitRate = (double) nbHits / (double) nbSeen;
