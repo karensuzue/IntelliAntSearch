@@ -1,49 +1,44 @@
 package example.dlant;
 
 import peersim.config.Configuration;
-import peersim.config.FastConfig;
 import peersim.core.Linkable;
 import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
 import peersim.edsim.EDSimulator;
 import peersim.transport.Transport;
-import peersim.vector.SingleValueHolder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
 public class DLAntProtocol implements EDProtocol {
 
-    // Constants
     private static final String PAR_TRANSPORT = ".transport";
     private static final String PAR_EVAPORATION = ".evaporation";
     private static final String PAR_ALPHA = ".alpha";
     private static final String PAR_LINKABLE = ".linkable";
+    private static final double q1 = 80; 
+    private static final double q2 = -0.2; 
 
-    // Pheromone-related parameters
-    private final double alpha; // Importance of the pheromone trail
-    private final double evaporation; // Rate of pheromone evaporation
-    private final int transportPid; // Transport layer ID
-    private final int linkablePid; // Linkable layer ID
-    private final Map<Node, Double> pheromoneLevels; // Pheromone levels to neighbors
-    
-    protected List<Integer> resources;
+    private final double alpha;
+    private final double evaporation;
+    private final int transportPid;
+    private final int linkablePid;
+    private final Map<Node, Double> pheromoneLevels;
+    private final Map<Node, Integer> queryHitCount;
+    protected ArrayList<Integer> resources;
 
-    // Constructor that initializes the protocol's parameters
     public DLAntProtocol(String prefix) {
-        this.transportPid = Configuration.getPid(prefix + PAR_TRANSPORT);
-        this.linkablePid = Configuration.getPid(prefix + PAR_LINKABLE);
-        this.alpha = Configuration.getDouble(prefix + PAR_ALPHA, 1.0);
-        this.evaporation = Configuration.getDouble(prefix + PAR_EVAPORATION, 0.1);
-        this.pheromoneLevels = new HashMap<>();
-
-        this.resources = new ArrayList<>();
+        transportPid = Configuration.getPid(prefix + PAR_TRANSPORT);
+        linkablePid = Configuration.getPid(prefix + PAR_LINKABLE);
+        alpha = Configuration.getDouble(prefix + PAR_ALPHA, 1.0);
+        evaporation = Configuration.getDouble(prefix + PAR_EVAPORATION, 0.1);
+        pheromoneLevels = new HashMap<>();
+        queryHitCount = new HashMap<>();
+        resources = new ArrayList<>();
     }
-
     public void addResource(int resource) {
         resources.add(resource);
     }
@@ -55,10 +50,10 @@ public class DLAntProtocol implements EDProtocol {
     public ArrayList<Integer> getResources() {
         return new ArrayList<>(resources);
     }
+    
 
     public void startAntSearch(Node startNode, int objectToSearch, int pid) {
         AntMessage msg = new AntMessage(startNode.getIndex(), objectToSearch, alpha, calculateInitialTTL());
-
         EDSimulator.add(0, msg, startNode, pid);
     }
 
@@ -66,29 +61,16 @@ public class DLAntProtocol implements EDProtocol {
     public void processEvent(Node node, int pid, Object event) {
         if (event instanceof AntMessage) {
             AntMessage msg = (AntMessage) event;
-
             if (msg.getPath().contains(node.getIndex())) {
                 return;
             }
-
             msg.addToPath(node.getIndex());
-
-            // Check if the object is found
-            if (this.resources.contains(msg.getContent())) {
+            boolean hitOccurred = this.resources.contains(msg.getContent());
+            if (hitOccurred) {
                 msg.incrementHitCount();
+                queryHitCount.put(node, queryHitCount.getOrDefault(node, 0) + 1);
             }
-
-            // Pheromone evaporation
-            pheromoneLevels.forEach((key, value) -> pheromoneLevels.put(key, value * (1 - evaporation)));
-            
-            System.out.println(msg);
-
-            // Update pheromone levels upon successful discovery
-            if (msg.isHit()) {
-                updatePheromones(msg, node);
-            }
-
-            // Forward the ant to neighbors based on the pheromone level
+            updatePheromones(msg, node, hitOccurred);
             if (msg.getTtl() > 0) {
                 forwardAnt(msg, node, pid);
             }
@@ -110,14 +92,20 @@ public class DLAntProtocol implements EDProtocol {
                 }
             });
         }
+
     }
 
-    private void updatePheromones(AntMessage msg, Node currentNode) {
-        Integer previousNodeIndex = msg.getPreviousNodeIndex();
-        if (previousNodeIndex != null) {
-            Node previousNode = Network.get(previousNodeIndex); // Convert index to Node
-            pheromoneLevels.merge(previousNode, alpha, (oldValue, newValue) -> oldValue + newValue);
+    private void updatePheromones(AntMessage msg, Node currentNode, boolean hit) {
+        if (hit) {
+            // Increase pheromones on the reverse path
+            for (int i = msg.getPath().size() - 2; i >= 0; i--) {
+                Node prevNode = Network.get(msg.getPath().get(i));
+                double delta = q1 * Math.exp(q2 * queryHitCount.getOrDefault(prevNode, 0));
+                pheromoneLevels.merge(prevNode, delta, Double::sum);
+            }
         }
+        // Evaporation
+        pheromoneLevels.replaceAll((node, pheromone) -> pheromone * (1 - evaporation));
     }
 
     private int calculateInitialTTL() {
