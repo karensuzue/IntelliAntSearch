@@ -1,45 +1,165 @@
+/*
+ * Copyright (c) 2003-2005 The BISON Project
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ */
+
 package iat.search;
 
+import java.util.HashMap;
+import java.util.Iterator;
+
 import peersim.config.Configuration;
+import peersim.core.CommonState;
+import peersim.core.Control;
 import peersim.core.Network;
-import peersim.core.Node;
 import peersim.util.IncrementalStats;
 
-public class SearchObserver implements peersim.core.Control {
-    /*
-     * 
-     * observer.0.verbosity 0
-
+public class SearchObserver implements Control {
+    // ---------------------------------------------------------------------
+    // Parameters
+    // ---------------------------------------------------------------------
+    /**
+     * String name of the parameter used to select the protocol to operate on
      */
+    public static final String PAR_PROT = "protocol";
 
+    /**
+     * String name of the parameter used to set the verbosity level. The default
+     * is 0 (non verbose).
+     */
     public static final String PAR_VERBOSITY = "verbosity";
-    public static final String PAR_PID = "protocol";
 
-    private final int verbosity;
-    private final int pid;
+    /**
+     * String name of the parameter used to force the non removal of ttl expired
+     * messages from the node memory. The default is false (not remove).
+     */
+    public static final String PAR_CLEAN_CACHE = "clean_cache";
 
-    public SearchObserver(String prefix) {
-        verbosity = Configuration.getInt(prefix + "." + PAR_VERBOSITY);
-        pid = Configuration.getPid(prefix + "." + PAR_PID);
+    // ---------------------------------------------------------------------
+    // Fields
+    // ---------------------------------------------------------------------
 
+    /** The name of this observer in the configuration */
+    protected final String name;
+
+    /** Protocol identifier */
+    protected final int pid;
+
+    protected final int verbosity;
+
+    protected final int len = Network.size();
+
+    // To remove or not the ttl expired messages from cache.
+    protected boolean cleanCache;
+
+    // ---------------------------------------------------------------------
+    // Initialization
+    // ---------------------------------------------------------------------
+
+    public SearchObserver(String name) {
+        this.name = name;
+        // Other parameters from config file:
+        pid = Configuration.getPid(name + "." + PAR_PROT);
+        verbosity = Configuration.getInt(name + "." + PAR_VERBOSITY, 0);
+        cleanCache = Configuration.contains(name + "." + PAR_CLEAN_CACHE);
     }
+
+    // ---------------------------------------------------------------------
+    // Methods
+    // ---------------------------------------------------------------------
 
     public boolean execute() {
-        long time = peersim.core.CommonState.getTime();
+        HashMap<Message, SearchStats> messageStats = new HashMap<Message, SearchStats>();
 
-        IncrementalStats is = new IncrementalStats();
+        for (int i = 0; i < len; i++) {
+            SearchProtocol prot = (SearchProtocol) Network.get(i).getProtocol(
+                    pid);
 
-        for (int i = 0; i < Network.size(); i++) {
-            peersim.core.Node node = Network.get(i);
+            int ttl = prot.ttl;
 
-            SearchProtocol prot = (SearchProtocol) node.getProtocol(pid);
+            int time = SearchUtils.getCycle();
 
-            is.add(prot.messageTable.size());
+            Iterator<Message> iter = prot.messageTable.keySet().iterator();
+
+            while (iter.hasNext()) {
+                // System.err.println("has next!");
+                Message msg = (Message) iter.next();
+
+                int age = time - msg.start - 1;
+
+                if (age > ttl) continue;
+
+                Integer msgValue = (Integer) prot.messageTable.get(msg);
+
+                int msgs = msgValue.intValue();
+                int hits = (prot.hitTable.contains(msg) ? 1 : 0);
+
+                SearchStats stats = (SearchStats) messageStats.get(msg);
+                
+                if (stats == null) {
+                    stats = new SearchStats(msg.seq, age, ttl);
+                    messageStats.put(msg, stats);
+                }
+
+                stats.update(msgs, hits);
+
+                if (cleanCache && age >= ttl) {
+                    iter.remove();
+                    prot.hitTable.remove(msg);
+                    prot.routingTable.remove(msg);
+                    prot.messageTable.remove(msg);
+                }
+            }
         }
 
-        System.out.println("SearchObserver" + ": " + time + " " + is);
-        
+        printItemsStatistics(messageStats);
+
         return false;
     }
-    
+
+
+    public void printItemsStatistics(HashMap<Message, SearchStats> messageStats) {
+        Iterator<SearchStats> iterStats = messageStats.values().iterator();
+        IncrementalStats hitRate = new IncrementalStats();
+        IncrementalStats networkLoad = new IncrementalStats();
+        IncrementalStats numQueries = new IncrementalStats();
+        IncrementalStats missedQueries = new IncrementalStats();
+
+        while (iterStats.hasNext()) {
+            SearchStats stats = (SearchStats) iterStats.next();
+
+            if (verbosity == 0 && stats.getAge() < stats.getTtl())
+                continue;
+
+            
+            hitRate.add(stats.hitRate);
+            networkLoad.add(stats.networkLoad);
+            numQueries.add(stats.nbMessages);
+            missedQueries.add(stats.missedRate);
+            
+            // incrementalStats.add(stats.networkLoad);
+            // incrementalStats.add(stats.avgHopCount);
+ 
+            // System.out.println(name + ": " + CommonState.getIntTime() + " "
+            //         + stats.toString());
+            // System.out.println(stats);
+        }
+
+
+        System.out.println("Hit Rate Avg: " + hitRate.getAverage()  + " Network Load Avg: " + networkLoad.getAverage() + " Messages: " + Math.floor(numQueries.getSum()) + " Failures: " + Math.floor(missedQueries.getSum()));
+    }
+
 }
