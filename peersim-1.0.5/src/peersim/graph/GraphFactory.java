@@ -120,16 +120,23 @@ public static Graph wireWS( Graph g, int k, double p, Random r ) {
 * @return returns g for convenience
 */
 public static Graph wireKOut( Graph g, int k, Random r ) {
+	int MIN = 10;
+	int MAX = 40;
+
+
+	int new_k = MIN + r.nextInt(MAX-MIN+1);
 
 	final int n = g.size();
 	if( n < 2 ) return g;
-	if( n <= k ) k=n-1;
+	if( n <= new_k ) new_k=n-1;
 	int[] nodes = new int[n];
 	for(int i=0; i<nodes.length; ++i) nodes[i]=i;
+
+
 	for(int i=0; i<n; ++i)
 	{
 		int j=0;
-		while(j<k)
+		while(j<new_k)
 		{
 			int newedge = j+r.nextInt(n-j);
 			int tmp = nodes[j];

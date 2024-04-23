@@ -55,9 +55,7 @@ public class SearchStats {
 
     public double networkLoad;
 
-    public double avgHopCount;
-
-    public double avgHopsBeforeHit;
+    public double missedRate;
 
     // ---------------------------------------------------------------------
     // Initialization
@@ -68,10 +66,8 @@ public class SearchStats {
         this.nbHits = 0;
         this.hitRate = 0.0;
         this.networkLoad = 0.0;
-        this.avgHopCount = 0.0;
-        this.avgHopsBeforeHit = 0.0;
+        this.missedRate = 0.0;
         this.nbMessages = 0;
-        // this.nbExtraProbes = 0;
         this.seq = seq;
         this.age = age;
         this.ttl = ttl;
@@ -92,23 +88,12 @@ public class SearchStats {
         // Update the network load
         this.networkLoad = (double) nbSeen / (double) Network.size();
 
-        // Update the average hop count
-        this.avgHopCount = (double) nbMessages / (double) nbSeen;
+        this.missedRate = nbMessages - nbHits;
+
     }
 
     public String toString() {
-        // Round the values to 2 decimal places
-        double _hitRate = Math.round(hitRate * 100.0) / 100.0;
-        double _networkLoad = Math.round(networkLoad * 100.0) / 100.0;
-        double _avgHopCount = Math.round(avgHopCount * 100.0) / 100.0;
-        double _avgHopsBeforeHit = Math.round(avgHopsBeforeHit * 100.0) / 100.0;
-
-
-        return "Seq(" + seq + ") TTL(" + (ttl - age) + ") #Seen(" + nbSeen + ") #Hits(" + nbHits + ") #Messages(" + nbMessages + ") HitRate(" + _hitRate + ") NetworkLoad(" + _networkLoad + ") AvgHopCount(" + _avgHopCount + ") AvgHopsBeforeHit(" + _avgHopsBeforeHit + ")";
-        // Print the sequence number, the age, the number of nodes that have with labels
-        // return "Seq: " + seq + " Age: " + age + " #Seen: " + nbSeen + " #Hits: " + nbHits + " #Messages: " + nbMessages + " HitRate: " + hitRate + " NetworkLoad: " + networkLoad;
-
-        // return ("" + seq + "\t" + age + "\t" + nbSeen + "\t" + nbHits + "\t" + nbMessages);
+        return "Seq: " + seq + " Age: " + age + " #Seen: " + nbSeen + " #Hits: " + nbHits + " #Messages: " + nbMessages + " HitRate: " + hitRate + " NetworkLoad: " + networkLoad;
     }
 
     public int getAge() {

@@ -111,6 +111,6 @@ public class Message implements Cloneable {
     }
 
     public String toString() {
-        return "SMessage[" + seq + "] hops=" + hops;
+        return "SMessage[" + seq + "] ttl=" + ttl;
     }
 }

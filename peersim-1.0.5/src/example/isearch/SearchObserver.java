@@ -101,6 +101,8 @@ public class SearchObserver implements Control {
                 // System.out.println("Copies: "+msgs);
                 int hits = (prot.hitTable.contains(msg) ? 1 : 0);
                 SearchStats stats = (SearchStats) messageStats.get(msg);
+
+        
                 
                 if (stats == null) {
                     stats = new SearchStats(msg.seq, age, ttl);
@@ -128,6 +130,7 @@ public class SearchObserver implements Control {
         IncrementalStats hitRate = new IncrementalStats();
         IncrementalStats networkLoad = new IncrementalStats();
         IncrementalStats numQueries = new IncrementalStats();
+        IncrementalStats missedQueries = new IncrementalStats();
 
         while (iterStats.hasNext()) {
             SearchStats stats = (SearchStats) iterStats.next();
@@ -139,16 +142,17 @@ public class SearchObserver implements Control {
             hitRate.add(stats.hitRate);
             networkLoad.add(stats.networkLoad);
             numQueries.add(stats.nbMessages);
+            missedQueries.add(stats.missedRate);
             
             // incrementalStats.add(stats.networkLoad);
             // incrementalStats.add(stats.avgHopCount);
  
             // System.out.println(name + ": " + CommonState.getIntTime() + " "
             //         + stats.toString());
-            // System.out.println(stats);
+            System.out.println(stats);
         }
 
-        System.out.println("Hit Rate Avg: " + hitRate.getAverage()  + " Network Load Avg: " + networkLoad.getAverage() + " Num Queries Avg: " + Math.floor(numQueries.getAverage()));
+        // System.out.println("Hit Rate Avg: " + hitRate.getAverage()  + " Network Load Avg: " + networkLoad.getAverage() + " Num Queries Avg: " + Math.floor(numQueries.getAverage()) + " Missed Queries Avg: " + Math.floor(missedQueries.getAverage()));
     }
 
 }

@@ -80,6 +80,8 @@ public void nextCycle( Node node, int pid )
 public void processEvent( Node node, int pid, Object event ) {
 		
 	AverageMessage aem = (AverageMessage)event;
+
+	System.out.println("ProcessEvent" + event.toString());
 	
 	if( aem.sender!=null )
 		((Transport)node.getProtocol(FastConfig.getTransport(pid))).

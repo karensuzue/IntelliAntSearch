@@ -36,6 +36,5 @@ public class FloodProtocol extends SearchProtocol {
                 this.send((Node) this.getNeighbor(i), m);
             }
         }
-        
     }
 }
