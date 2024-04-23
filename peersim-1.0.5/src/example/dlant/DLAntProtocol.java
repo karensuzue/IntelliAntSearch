@@ -59,7 +59,7 @@ public class DLAntProtocol implements EDProtocol {
     public void startAntSearch(Node startNode, int objectToSearch, int pid) {
         AntMessage msg = new AntMessage(startNode.getIndex(), objectToSearch, alpha, calculateInitialTTL());
 
-        EDSimulator.add(0, msg, startNode, pid);
+        EDSimulator.add(0, msg, startNode, pid); // queues up EDSimulator
     }
 
     @Override
@@ -67,10 +67,12 @@ public class DLAntProtocol implements EDProtocol {
         if (event instanceof AntMessage) {
             AntMessage msg = (AntMessage) event;
 
+            // If message already visited node, return
             if (msg.getPath().contains(node.getIndex())) {
                 return;
             }
 
+            // Otherwise, add to message's path
             msg.addToPath(node.getIndex());
 
             // Check if the object is found
@@ -78,7 +80,9 @@ public class DLAntProtocol implements EDProtocol {
                 msg.incrementHitCount();
             }
 
-            // Pheromone evaporation
+            // Pheromone evaporation (decrease pheromone value)
+            // Explicit pheromone evaporation is not in DLAnt
+            // Pheromone tables are updated then normalized (Algorithms 1 and 2)
             pheromoneLevels.forEach((key, value) -> pheromoneLevels.put(key, value * (1 - evaporation)));     
             
             System.out.println(msg);

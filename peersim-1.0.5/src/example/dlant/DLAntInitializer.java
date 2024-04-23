@@ -6,6 +6,7 @@ import peersim.config.Configuration;
 import peersim.core.Control;
 import peersim.core.Network;
 
+// Protocol to add resources to the DLAntProtocol of each node?
 public class DLAntInitializer implements Control {
     // ------------------------------------------------------------------------
     // Constants
@@ -39,6 +40,7 @@ public class DLAntInitializer implements Control {
     @Override
     public boolean execute() {
         // TODO Auto-generated method stub
+        
 
         for (int i = 0; i < Network.size(); i++) {
             DLAntProtocol prot = (DLAntProtocol) Network.get(i).getProtocol(pid);
