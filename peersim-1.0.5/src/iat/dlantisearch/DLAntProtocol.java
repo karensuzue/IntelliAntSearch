@@ -30,19 +30,24 @@ public class DLAntProtocol extends SearchProtocol {
         transportID = Configuration.getPid(prefix + "." + PAR_TRANSPORT);
     }
 
+    // ----------------------------------------------------------
+    // Override
+    // ----------------------------------------------------------
+
     /*
      * Called in SearchProtocol every time message arrives to a node 
      * Necessary for ED simulation
      */
     @Override
     public void process(Message msg) {
-        if (this.match(msg.payload)) { // Hit
+        if (this.match(msg.payload)) { // Hit at current node
             this.notifyOriginator(msg); // notify query originator
 
             processSuccess(msg);
         }
 
-        else { processMiss(msg); }        
+        // else { processMiss(msg); }    
+        processMiss(msg);    
     }
 
     /*
@@ -61,6 +66,8 @@ public class DLAntProtocol extends SearchProtocol {
 
         if (data != null) {
             Message m = new Message(node, Message.QRY, 0, data, ttl); // QRY, because initiate message
+            this.messageTable.put(m, Integer.valueOf(1)); // originator seen message, THIS CHANGES HIT RATE SIGNIFICANTLY.
+            // If you include this line hit rate will dramatically decrease
             
             // Random "r" between 0.0 and 1.0
             pherThreshold = random.nextDouble(); 
@@ -73,7 +80,70 @@ public class DLAntProtocol extends SearchProtocol {
             }
         }
     }
-    
+
+      /**
+     * Figure 3 in Ahmadi et al. 2016
+     * Used by originator. Floods a subset of neighbors with highest pheromone values
+     * @param node Node being communicated with
+     * @param msg Message object
+     */
+    @Override
+    public void send(Node neighbor, Message msg) {
+        // Neighbor's pheromone value
+        Double pheromone = pherProtocol.getPheromone(neighbor);
+        // If neighbor's pheromone value > "r"
+        if (pheromone > pherThreshold) { // TODO: If pheromones start out uniform...
+            // Duplicate message
+            Message replicatedMsg = (Message) msg.copy();
+             // TTL update parameters
+            Double low_bound = pherProtocol.low; 
+            Double high_bound = pherProtocol.high;
+
+            // Adjust TTL of message
+            ttlAdjust(replicatedMsg, pheromone, low_bound, high_bound);
+
+            // Add neighbor to path
+            replicatedMsg.addToPath(neighbor); 
+            replicatedMsg.hops++;
+
+            Transport tr = (Transport) neighbor.getProtocol(this.transportID);
+            tr.send(whoAmI, neighbor, replicatedMsg, pid); // pid defined in SearchProtocol
+            
+
+            updateRoutingTable(neighbor, replicatedMsg);
+        }
+    }
+
+    /**
+     * Part I of Figure 4 in Ahmadi et al. 2016
+     * Used by intermediate nodes to forward message to a single neighbor with highest pheromone value.
+     * @param n Node being forwarded to
+     * @param msg Message being forwarded
+     */
+    @Override
+    public void forward(Node n, Message msg) {
+        Double pheromone = pherProtocol.getPheromone(n);
+
+        // Duplicate message
+        Message replicatedMsg = (Message) msg.copy();
+        // TTL update parameters
+        Double low_bound = pherProtocol.low; 
+        Double high_bound = pherProtocol.high;
+       
+        ttlAdjust(replicatedMsg, pheromone, low_bound, high_bound);
+        replicatedMsg.addToPath(n); // Add neighbor to path
+        replicatedMsg.hops++;
+
+        Transport tr = (Transport) n.getProtocol(this.transportID);
+        tr.send(whoAmI, n, replicatedMsg, pid); // pid defined in SearchProtocol
+
+        updateRoutingTable(n, replicatedMsg);
+    }
+
+    // ----------------------------------------------------------
+    // Process Query
+    // ----------------------------------------------------------
+        
     /**
      * Algorithm 1 and 2 in Loukos et al. 2010
      * Updates query hit table of nodes in path. Updates pheromone table of nodes in path 
@@ -114,65 +184,6 @@ public class DLAntProtocol extends SearchProtocol {
         if (pher < low) { msg.ttl--; }
         else if (pher > high) { msg.ttl++; }        
     }
-
-    /**
-     * Figure 3 in Ahmadi et al. 2016
-     * Used by originator. Floods a subset of neighbors with highest pheromone values
-     * @param node Node being communicated with
-     * @param msg Message object
-     */
-    @Override
-    public void send(Node neighbor, Message msg) {
-        // Neighbor's pheromone value
-        Double pheromone = pherProtocol.getPheromone(neighbor);
-        // If neighbor's pheromone value > "r"
-        if (pheromone > pherThreshold) {
-            // Duplicate message
-            Message replicatedMsg = (Message) msg.copy();
-             // TTL update parameters
-            Double low_bound = pherProtocol.low; 
-            Double high_bound = pherProtocol.high;
-
-            // Adjust TTL of message
-            ttlAdjust(replicatedMsg, pheromone, low_bound, high_bound);
-
-            // Add neighbor to path
-            replicatedMsg.addToPath(neighbor); 
-            replicatedMsg.hops++;
-
-            Transport tr = (Transport) neighbor.getProtocol(this.transportID);
-            tr.send(whoAmI, neighbor, replicatedMsg, pid); // pid defined in SearchProtocol
-
-            updateRoutingTable(neighbor, replicatedMsg);
-        }
-    }
-
-    /**
-     * Part I of Figure 4 in Ahmadi et al. 2016
-     * Used by intermediate nodes to forward message to a single neighbor with highest pheromone value.
-     * @param n Node being forwarded to
-     * @param msg Message being forwarded
-     */
-    @Override
-    public void forward(Node n, Message msg) {
-        Double pheromone = pherProtocol.getPheromone(n);
-
-        // Duplicate message
-        Message replicatedMsg = (Message) msg.copy();
-        // TTL update parameters
-        Double low_bound = pherProtocol.low; 
-        Double high_bound = pherProtocol.high;
-       
-        ttlAdjust(replicatedMsg, pheromone, low_bound, high_bound);
-        replicatedMsg.addToPath(n); // Add neighbor to path
-        replicatedMsg.hops++;
-
-        Transport tr = (Transport) n.getProtocol(this.transportID);
-        tr.send(whoAmI, n, replicatedMsg, pid); // pid defined in SearchProtocol
-
-        updateRoutingTable(n, replicatedMsg);
-    }
-
 
      /**
       * Part II of Figure 4 in Ahmadi et al. 2016
