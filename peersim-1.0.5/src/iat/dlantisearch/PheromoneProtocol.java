@@ -19,9 +19,6 @@ import peersim.core.Node;
  * WireGraph protocols, because it implements Linkable. 
  * NOTE: This is the version that extends IdleProtocol
  * TODO: Merge this version with the original? (which implements Protocol, Linkable)
- *  TODO: Actually don't, because
- *          - Pheromone table methods are deprecated for iSearch implementation
- *          - Will sort out later
  */
 public class PheromoneProtocol extends IdleProtocol {
 
@@ -47,15 +44,15 @@ public class PheromoneProtocol extends IdleProtocol {
 
     // For AntP2PR implementation
     // <neighbor index (in neighbors), pheromone value>
-    protected Map<Node, Double> pherTable = new HashMap<>(); 
+    protected Map<Integer, Double> pherTable = new HashMap<>(); 
     // <neighbor index, query hit count>
-    protected Map<Node, Integer> queryHitCount = new HashMap<>();
+    protected Map<Integer, Integer> queryHitCount = new HashMap<>();
     // Resources are abstracted as unique integers
     protected List<Integer> resources = new ArrayList<>();
     // Parameters for update function
     protected double q1, q2, low, high; 
 
-    private final double uniformPheromone = CommonState.r.nextDouble();
+    private final double uniformPheromone = 1.0;
     
     // ----------------------------------------------------------
     // Initialization
@@ -85,17 +82,20 @@ public class PheromoneProtocol extends IdleProtocol {
      */
     public void updatePherTable() {
         // Iterate through the pherTable map
-        for (Map.Entry<Node, Double> entry : pherTable.entrySet()) {
-            Node neighbor = entry.getKey();
+        for (Map.Entry<Integer, Double> entry : pherTable.entrySet()) {
+            Integer neighborIdx = entry.getKey();
             Double pheromone = entry.getValue();
-            int queryHit = queryHitCount.get(neighbor);
-                    
+            int queryHit = queryHitCount.get(neighborIdx);
+
             // Update the value (for example, increment by 1)
             Double delta = q1 * Math.pow(Math.E, q2 * queryHit);
+
+            // System.out.println("Neighbor: " + neighbor.getID() + " Pheromone: " + pheromone + " Query Hit: " + queryHit + " Delta: " + delta);
                     
             // Update the value in pherTable
-            pherTable.put(neighbor, pheromone + delta);
+            pherTable.put(neighborIdx, pheromone + delta);
         }
+
     }
 
     /**
@@ -104,20 +104,30 @@ public class PheromoneProtocol extends IdleProtocol {
      * This is performed after updating the pheromone table
      */
     public void normalizePherTable() {
+        // Find the sum of all pheromone values
         Double sum = 0.0;
-        for (Map.Entry<Node, Double> entry : pherTable.entrySet()) {
-            sum = sum + entry.getValue();
+
+        for (Double pheromone : pherTable.values()) {
+            sum += pheromone;
         }
 
-        for (Map.Entry<Node, Double> entry : pherTable.entrySet()) {
-            pherTable.put(entry.getKey(), entry.getValue() / sum );
-        } 
+        HashMap<Integer, Double> normalizedPherTable = new HashMap<>();
+
+        for (Map.Entry<Integer, Double> pherEntry : pherTable.entrySet()) {
+            Integer neighborIdx = pherEntry.getKey();
+            Double pheromone = pherEntry.getValue();
+
+            normalizedPherTable.put(neighborIdx, pheromone / sum);
+        }
+
+
+        pherTable = normalizedPherTable;
     }
 
     public Double getPheromone(Node node) {
-        if (pherTable.containsKey(node)) {
+        if (pherTable.containsKey(node.getIndex())) {
             // Retrieve and return the pheromone value associated with the node
-            return pherTable.get(node);
+            return pherTable.get(node.getIndex());
         } else {
             // If the node is not found in the pherTable
             throw new IllegalArgumentException("Node not found in the pherTable");
@@ -138,7 +148,7 @@ public class PheromoneProtocol extends IdleProtocol {
 
     /** Increment query hit count for neighbor */
     public void incrementQueryHit(Node neighbor) {
-        queryHitCount.put(neighbor, queryHitCount.getOrDefault(neighbor, 0) + 1);
+        queryHitCount.put(neighbor.getIndex(), queryHitCount.getOrDefault(neighbor.getIndex(), 0) + 1);
     }
 
    
@@ -158,11 +168,21 @@ public class PheromoneProtocol extends IdleProtocol {
 
         // Give neighbor uniform random pheromone value
         // HashMap dynamically resizes itself
-        pherTable.put(neighbor, uniformPheromone);
+        
+        // If we're in the adding phase i.e. all neighbors should have uniform pheromone
+        if (CommonState.getIntTime() == 0) {
+            // Set pheromone value to be similar to others in the table
+            
+            Double value = pherTable.isEmpty() ? uniformPheromone : pherTable.entrySet().iterator().next().getValue();
+            pherTable.put(neighbor.getIndex(), value);
+        } else {
+            pherTable.put(neighbor.getIndex(), uniformPheromone);
+        }
+
         normalizePherTable();
 
         // Initialize query hit count as 0
-        queryHitCount.put(neighbor, 0);
+        queryHitCount.put(neighbor.getIndex(), 0);
 
         return true;
     }
@@ -177,14 +197,14 @@ public class PheromoneProtocol extends IdleProtocol {
 	    PheromoneProtocol pp = (PheromoneProtocol) super.clone();
 
         // Clone pheromone table
-        pp.pherTable = new HashMap<Node, Double>();
-        for (Map.Entry<Node, Double> entry : this.pherTable.entrySet()) {
+        pp.pherTable = new HashMap<Integer, Double>();
+        for (Map.Entry<Integer, Double> entry : this.pherTable.entrySet()) {
             pp.pherTable.put(entry.getKey(), entry.getValue());
         }
 
         // Clone query hit count table
-        pp.queryHitCount = new HashMap<Node, Integer>();
-        for (Map.Entry<Node, Integer> entry : this.queryHitCount.entrySet()) {
+        pp.queryHitCount = new HashMap<Integer, Integer>();
+        for (Map.Entry<Integer, Integer> entry : this.queryHitCount.entrySet()) {
             pp.queryHitCount.put(entry.getKey(), entry.getValue());
         }
         

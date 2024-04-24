@@ -189,9 +189,9 @@ public abstract class SearchProtocol implements CDProtocol, EDProtocol {
             Message mes = (Message) event;
             
             Integer actual = (Integer) this.messageTable.get(mes);
-            int index = (actual != null ? actual.intValue() + 1 : 1); // increment seen count
+            int index = (actual != null ? actual.intValue() + 1 : 1);
             this.messageTable.put(mes, Integer.valueOf(index));
-            this.process(mes); // process message: hit or miss, then forward
+            this.process(mes);
         } else {
             throw new IllegalArgumentException("Unknown event type");
         }
