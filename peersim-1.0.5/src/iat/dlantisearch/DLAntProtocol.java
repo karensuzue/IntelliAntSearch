@@ -22,6 +22,8 @@ public class DLAntProtocol extends SearchProtocol {
     private int transportID; 
 
     PheromoneProtocol pherProtocol;
+    
+    Double pherThreshold;
 
     public DLAntProtocol(String prefix) {
         super(prefix);
@@ -39,6 +41,7 @@ public class DLAntProtocol extends SearchProtocol {
 
             processSuccess(msg);
         }
+
         else { processMiss(msg); }        
     }
 
@@ -58,8 +61,16 @@ public class DLAntProtocol extends SearchProtocol {
 
         if (data != null) {
             Message m = new Message(node, Message.QRY, 0, data, ttl); // QRY, because initiate message
+            
+            // Random "r" between 0.0 and 1.0
+            pherThreshold = random.nextDouble(); 
+            pherProtocol = (PheromoneProtocol) whoAmI.getProtocol(getLinkableID());
 
-            send(node, m);
+            // Iterate through current node's neighbors
+            for (int i = 0; i < pherProtocol.degree(); i++) {
+                Node neighbor = (Node) pherProtocol.getNeighbor(i);
+                send(neighbor, m);
+            }
         }
     }
     
@@ -104,62 +115,35 @@ public class DLAntProtocol extends SearchProtocol {
         else if (pher > high) { msg.ttl++; }        
     }
 
-
     /**
      * Figure 3 in Ahmadi et al. 2016
      * Used by originator. Floods a subset of neighbors with highest pheromone values
-     * @param node Originator node
+     * @param node Node being communicated with
      * @param msg Message object
      */
     @Override
-    public void send(Node node, Message msg) {
-        msg.addToPath(node); // Add originator to path
+    public void send(Node neighbor, Message msg) {
+        // Neighbor's pheromone value
+        Double pheromone = pherProtocol.getPheromone(neighbor);
+        // If neighbor's pheromone value > "r"
+        if (pheromone > pherThreshold) {
+            // Duplicate message
+            Message replicatedMsg = (Message) msg.copy();
+             // TTL update parameters
+            Double low_bound = pherProtocol.low; 
+            Double high_bound = pherProtocol.high;
 
-        // We know this part impacts the hit rate if it's removed, 
-        // probbaly because it's comparing hits to messages seen but failed?
-        // Do we need to use messagetable? SearchProtocol's send does not
-        /*
-        Integer actual = (Integer) this.messageTable.get(msg);
-        int index = (actual != null ? actual.intValue() + 1 : 1);
-        // messageTable stores the number of times a node has seen a packet/message
-        this.messageTable.put(msg, Integer.valueOf(index)); 
-        */
+            // Adjust TTL of message
+            ttlAdjust(replicatedMsg, pheromone, low_bound, high_bound);
 
-        // Obtain PheromoneProtocol of node
-        PheromoneProtocol pherProt = (PheromoneProtocol) node.getProtocol(getLinkableID());
+            // Add neighbor to path
+            replicatedMsg.addToPath(neighbor); 
+            replicatedMsg.hops++;
 
-        // Random "r" between 0.0 and 1.0
-        Double pherThreshold = random.nextDouble(); 
+            Transport tr = (Transport) neighbor.getProtocol(this.transportID);
+            tr.send(whoAmI, neighbor, replicatedMsg, pid); // pid defined in SearchProtocol
 
-        // Iterate through current node's neighbors
-        for (int i = 0; i < pherProt.degree(); i++) {
-            Node neighbor = (Node) pherProt.getNeighbor(i);
-
-            // Neighbor's pheromone value
-            Double pheromone = pherProt.getPheromone(neighbor);
-
-            // If neighbor's pheromone value > "r"
-            if (pheromone > pherThreshold) {
-                // Duplicate message
-                Message replicatedMsg = (Message) msg.copy();
-                 // TTL update parameters
-                Double low_bound = pherProt.low; 
-                Double high_bound = pherProt.high;
-
-                ttlAdjust(replicatedMsg, pheromone, low_bound, high_bound);
-
-                replicatedMsg.addToPath(neighbor); // Add neighbor to path
-                replicatedMsg.hops++;
-
-                // send(neighbor, replicatedMsg);
-                // Can't use SearchProtocol's send() as it would result in too many message copies 
-                // send() also does its own TTL update
-                // We use transport directly
-                Transport tr = (Transport) neighbor.getProtocol(this.transportID);
-                tr.send(node, neighbor, replicatedMsg, pid); // pid defined in SearchProtocol
-
-                updateRoutingTable(neighbor, replicatedMsg);
-            } 
+            updateRoutingTable(neighbor, replicatedMsg);
         }
     }
 
@@ -202,7 +186,7 @@ public class DLAntProtocol extends SearchProtocol {
             return;
         }
 
-        pherProtocol = (PheromoneProtocol) whoAmI.getProtocol(getLinkableID());
+        // pherProtocol = (PheromoneProtocol) whoAmI.getProtocol(getLinkableID());
 
         // Find neighbor with highest pheromone
         Node highestNeighbor = whoAmI; // Should not be current node by the time this is done
