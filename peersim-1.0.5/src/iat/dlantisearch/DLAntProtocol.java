@@ -34,7 +34,7 @@ public class DLAntProtocol extends SearchProtocol {
      */
     @Override
     public void process(Message msg) {
-        // TODO: TTL Condition check is done in process(), not here
+        System.out.println(msg.path);
         if (this.match(msg.payload)) { // Hit
             this.notifyOriginator(msg); // notify query originator
 
@@ -46,7 +46,7 @@ public class DLAntProtocol extends SearchProtocol {
 
     /*
      * Overrides CDProtocol's and SearchProtocol's nextCycle
-     * A CDProtocol method, but is used to generate new query for our ED simulation 
+     * A CDProtocol method, but is used to generate new queries for our ED simulation 
      * (would require CDscheduler in config)
      * @param node Originator node
      * @param protocolID 
@@ -55,6 +55,7 @@ public class DLAntProtocol extends SearchProtocol {
     public void nextCycle(Node node, int protocolID) {
         super.nextCycle(node, protocolID); // invoke superclass method (from SearchProtocol)
 
+        // Generate data for query
         int[] data = this.pickQueryData();
 
         if (data != null) {

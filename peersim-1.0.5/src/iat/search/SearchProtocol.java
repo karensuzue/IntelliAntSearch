@@ -192,6 +192,7 @@ public abstract class SearchProtocol implements CDProtocol, EDProtocol {
             int index = (actual != null ? actual.intValue() + 1 : 1);
             this.messageTable.put(mes, Integer.valueOf(index));
             this.process(mes);
+
         } else {
             throw new IllegalArgumentException("Unknown event type");
         }
