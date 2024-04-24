@@ -34,14 +34,12 @@ public class DLAntProtocol extends SearchProtocol {
      */
     @Override
     public void process(Message msg) {
-        System.out.println(msg.path);
         if (this.match(msg.payload)) { // Hit
             this.notifyOriginator(msg); // notify query originator
 
             processSuccess(msg);
         }
-
-        processMiss(msg);
+        else { processMiss(msg); }        
     }
 
     /*
@@ -85,7 +83,9 @@ public class DLAntProtocol extends SearchProtocol {
             PheromoneProtocol pathNodeProtocol = 
                 (PheromoneProtocol) pathNode.getProtocol(getLinkableID());
 
-            pathNodeProtocol.incrementQueryHit(prevNode); // Increment query hit of pathNode
+            // Increment query hit of pathNode
+            pathNodeProtocol.incrementQueryHit(prevNode); // For previous node in path
+            
 
             pathNodeProtocol.updatePherTable(); // Update pheromone table of pathNode
             pathNodeProtocol.normalizePherTable(); // Normalize pheromone table of pathNode
@@ -115,11 +115,17 @@ public class DLAntProtocol extends SearchProtocol {
     public void send(Node node, Message msg) {
         msg.addToPath(node); // Add originator to path
 
+        // We know this part impacts the hit rate if it's removed, 
+        // probbaly because it's comparing hits to messages seen but failed?
+        // Do we need to use messagetable? SearchProtocol's send does not
+        /*
         Integer actual = (Integer) this.messageTable.get(msg);
         int index = (actual != null ? actual.intValue() + 1 : 1);
         // messageTable stores the number of times a node has seen a packet/message
         this.messageTable.put(msg, Integer.valueOf(index)); 
+        */
 
+        // Obtain PheromoneProtocol of node
         PheromoneProtocol pherProt = (PheromoneProtocol) node.getProtocol(getLinkableID());
 
         // Random "r" between 0.0 and 1.0
