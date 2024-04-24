@@ -46,8 +46,9 @@ public class DLAntProtocol extends SearchProtocol {
             processSuccess(msg);
         }
 
-        // else { processMiss(msg); }    
-        processMiss(msg);    
+        // else { processMiss(msg); }   // Not how DLAnt actually works
+        processMiss(msg); // DLAnt continues despite hit, so this is actually accurate
+        // Remove 'else' increases performance slightly    
     }
 
     /*
@@ -66,8 +67,10 @@ public class DLAntProtocol extends SearchProtocol {
 
         if (data != null) {
             Message m = new Message(node, Message.QRY, 0, data, ttl); // QRY, because initiate message
-            this.messageTable.put(m, Integer.valueOf(1)); // originator seen message, THIS CHANGES HIT RATE SIGNIFICANTLY.
+            // this.messageTable.put(m, Integer.valueOf(1)); // originator seen message, THIS CHANGES HIT RATE SIGNIFICANTLY.
             // If you include this line hit rate will dramatically decrease
+            // If commented out, hit rate goes from 0.05 -> 0.5 approx, but also NaN network load and hit rate in the beginning
+            // NaN -> Invalid operations? Because of 0 messages??
             
             // Random "r" between 0.0 and 1.0
             pherThreshold = random.nextDouble(); 
