@@ -30,7 +30,7 @@ public class AntControl implements Control {
      */
     @Override
     public boolean execute() {
-         // Trigger the flooding protocol from a random node
+        // Trigger the flooding protocol from a random node
         Node randSrc = Network.get(CommonState.r.nextInt(Network.size()));
         // Time to live for messages
         int ttl = 3; 

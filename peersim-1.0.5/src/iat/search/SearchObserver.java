@@ -159,7 +159,7 @@ public class SearchObserver implements Control {
         }
 
 
-        System.out.println("Hit Rate Avg: " + hitRate.getAverage()  + " Network Load Avg: " + networkLoad.getAverage() + " Messages: " + Math.floor(numQueries.getSum()) + " Failures: " + Math.floor(missedQueries.getSum()));
+        System.out.println("Hit Rate Avg: " + hitRate.getAverage()  + " Network Load Avg: " + networkLoad.getAverage() + " Messages: " + Math.floor(numQueries.getSum()));
     }
 
 }

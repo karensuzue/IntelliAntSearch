@@ -7,7 +7,9 @@ import java.util.List;
 public class AntMessage {
     private final int source;
     private int content;
-    private double pheromoneLevel;
+    // pheromone level will be on the nodes themselves, not the messages.
+    // This could still work if it's reading the pheromone value of the node it's at
+    private double pheromoneLevel;  
     private int ttl;
     private int hitCount;
     private List<Integer> path; 

@@ -6,11 +6,11 @@ import java.util.Random;
 import peersim.config.Configuration;
 import peersim.core.Control;
 import peersim.core.Network;
-import peersim.core.CommonState; // Import CommonState
+import peersim.core.CommonState; 
 
 public class DLAntControl implements Control {
 
-    private final int pid;
+    private final int pid; // Protocol ID
 
     public DLAntControl(String prefix) {
         pid = Configuration.getPid(prefix + ".protocol");
@@ -24,7 +24,8 @@ public class DLAntControl implements Control {
             return true;
         }
         
-
+        // Obtain a random node 
+        // Select index within the range of available nodes in the network.
         int startIndex = CommonState.r.nextInt(size);
         Node startNode = Network.get(startIndex);
 
