@@ -26,7 +26,6 @@ public class DLAntProtocol extends SearchProtocol {
     public DLAntProtocol(String prefix) {
         super(prefix);
         transportID = Configuration.getPid(prefix + "." + PAR_TRANSPORT);
-        pherProtocol = (PheromoneProtocol) whoAmI.getProtocol(getLinkableID());
     }
 
     /*
@@ -195,6 +194,8 @@ public class DLAntProtocol extends SearchProtocol {
             if (msg.hits == 0) { this.failedTable.add(msg); }
             return;
         }
+
+        pherProtocol = (PheromoneProtocol) whoAmI.getProtocol(getLinkableID());
 
         // Find neighbor with highest pheromone
         Node highestNeighbor = whoAmI; // Should not be current node by the time this is done
