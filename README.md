@@ -73,3 +73,7 @@ NOTE: To run the simulation, make sure you are in the `peersim-1.0.5` directory.
 #### LSTM -
 
 For the machine learning part, we ran the simulation as normal and copied the results of it to  ```LSTM.ipynb``` and ran the model on them to produce the parameters
+
+#### Protocol Implementations -
+
+All the protocol implementations are in ```peersim-1.0.5/src/iat/**```
